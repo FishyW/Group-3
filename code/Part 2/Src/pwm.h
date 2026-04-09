@@ -3,25 +3,10 @@
 
 #include 'timer.h'
 
-uint8_t duty_cycle
+uint8_t duty_cycle;
 
-// Part C seems simple enough?
+// generate_pulse: writes high to given GPIO pin, then after duty_cycle ms, writes low.
+void generate_pulse(function GPIO_write);
 
-// The idea is: Set GPIO pins at a specific interval.
-
-
-
-
-
-void generate_pwm_signal_0(){
-	GPIO(HIGH);
-	oneshot_function(duty_cycle, GPIO(LOW));
-}
-
-void generate_pwm_signal(){
-	periodic_function()
-}
-
-periodic_function(generate_pwm_signal){
-	generate_pwm_signal
-}
+// generate_pwm_signal: loops generate_pulse using periodic event.
+void generate_pwm_signal();

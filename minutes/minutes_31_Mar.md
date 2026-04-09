@@ -1,9 +1,0 @@
-Agenda:
-- Discuss current progress
-- Set roles going forward
-
-Discussion:
-- Due to assignment overlap, progress has been minimal.
-- Another deadline of before the lab has been set for completion of functioning modules.
-- Going forward: Since the GPIO is utmost priority, Jack has volunteered to code it asap.
-- Otherwise, everyone else to complete their modules.
