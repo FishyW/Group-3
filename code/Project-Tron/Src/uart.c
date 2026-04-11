@@ -14,11 +14,22 @@ struct _SerialPort {
 	volatile uint32_t SerialPinAlternatePinValueHigh;
 };
 
+SerialPort USART1_PORT = {USART1,
+		GPIOC,
+		RCC_APB2ENR_USART1EN, // bit to enable for APB2 bus
+		0x00,	// bit to enable for APB1 bus
+		RCC_AHBENR_GPIOCEN, // bit to enable for AHB bus
+		0xA00,
+		0xF00,
+		0x770000,  // for USART1 PC10 and 11, this is in the AFR low register
+		0x00, // no change to the high alternate function register
+		};
+
+
 // InitialiseSerial - Initialise the serial port
 // Input: baudRate is from an enumerated set
-void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*completion_function)(uint32_t)) {
+void SerialInitialise(uint32_t baudRate, SerialPort *serial_port) {
 
-	serial_port->completion_function = completion_function;
 
 	// enable clock power, system configuration clock and GPIOC
 	// common to all UARTs
@@ -46,25 +57,27 @@ void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*complet
 	uint16_t *baud_rate_config = (uint16_t*)&serial_port->UART->BRR; // only 16 bits used!
 
 	// Baud rate calculation from datasheet
+	// Baud = fck/USARTDIV, USARTDIV = fck/Baud (oversampling by 16, OVER8 = 0)
 	switch(baudRate){
 	case BAUD_9600:
-		// NEED TO FIX THIS !
-		*baud_rate_config = 0x46;  // 115200 at 8MHz
+		// 8 * 10^6 /(9600) = 0x341
+		*baud_rate_config = 0x341;  // 9600 at 8MHz
 		break;
 	case BAUD_19200:
-		// NEED TO FIX THIS !
-		*baud_rate_config = 0x46;  // 115200 at 8MHz
+		// 8 * 10^6 /(19200) = 0x1A1
+		*baud_rate_config = 0x1A1;  // 19200 at 8MHz
 		break;
 	case BAUD_38400:
-		// NEED TO FIX THIS !
-		*baud_rate_config = 0x46;  // 115200 at 8MHz
+		// 8 * 10^6 /(38400) = 0xD0
+		*baud_rate_config = 0xD0;  // 38400 at 8MHz
 		break;
 	case BAUD_57600:
-		// NEED TO FIX THIS !
-		*baud_rate_config = 0x46;  // 115200 at 8MHz
+		// 8 * 10^6 /(57600) = 0x8B
+		*baud_rate_config = 0x8B;  // 57600 at 8MHz
 		break;
 	case BAUD_115200:
-		*baud_rate_config = 0x46;  // 115200 at 8MHz
+		// 8 * 10^6 /(57600) = 0x45
+		*baud_rate_config = 0x45;  // 115200 at 8MHz
 		break;
 	}
 
@@ -91,5 +104,19 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 		pt++;
 	}
 
-	serial_port->completion_function(counter);
+}
+
+void SimpleDelay() {
+	// 0xA2C2B -> "666667 clock cycles"
+	// from testing (using a metronome) this is ~1 second
+	for (uint32_t i = 0; i < 0xA2C2B; ++i) {}
+}
+
+void TestSerial() {
+	SerialInitialise(BAUD_9600, &USART1_PORT);
+
+	for (;;) {
+		SerialOutputString((uint8_t*)"hello\r\n", &USART1_PORT);
+		SimpleDelay();
+	}
 }

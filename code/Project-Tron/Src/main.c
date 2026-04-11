@@ -17,13 +17,14 @@
  */
 
 #include <stdint.h>
-#include <stm32f303xc.h>
 
 #include "uart.h"
 
 int main(void)
 {
 
+	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM
+	TestSerial();
 
 
     /* Loop forever */

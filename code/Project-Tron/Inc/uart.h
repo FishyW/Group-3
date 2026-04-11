@@ -1,6 +1,7 @@
 #ifndef UART_MODULE_H
 #define UART_MODULE_H
 
+#include <stdint.h>
 // Defining the serial port struct, the definition is hidden in the
 // c file as no one really needs to know this.
 struct _SerialPort;
@@ -28,5 +29,11 @@ void SerialOutputChar(uint8_t, SerialPort *serial_port);
 // output a string over serial, must be null terminated
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port);
 
+
+/*
+ * Test Functions
+ */
+
+void TestSerial();
 
 #endif
