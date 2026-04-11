@@ -23,8 +23,17 @@
 int main(void)
 {
 
-	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM
+	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM, BUT DO NOT DELETE THEM
+	// Exercise 1: Digital I/O
+
+	// Exercise 2: Timer Interface
+
+	// Exercise 3: Serial interface
 	TestSerial();
+
+	// Exercise 4: I2C Sensor Interfacing
+
+	// Exercise 5: Integration Task
 
 
     /* Loop forever */
