@@ -16,14 +16,33 @@
  ******************************************************************************
  */
 
-#include <stdint.h>
+#include <stdlib.h>
+#include "stm32f303xc.h"
+
+#include "timer.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-int main(void)
-{
-    /* Loop forever */
-	for(;;);
+// ════════════════════════════════════════════════════════
+// TEST CODE — put this in main.c
+// ════════════════════════════════════════════════════════
+
+// toggle LED on PE8 every time periodic fires
+void test_periodic(void *args) {
+    GPIOE->ODR ^= (1 << 8);
+}
+
+int main(void) {
+    // enable GPIOE clock and set PE8 as output
+    RCC->AHBENR  |= RCC_AHBENR_GPIOEEN;
+    GPIOE->MODER |= (1 << (8 * 2));
+
+    // periodic every 500ms, no oneshot for now
+    timer_init(500, test_periodic, 0, NULL);
+
+    while(1) {
+        // nothing here — LED toggles in background
+    }
 }

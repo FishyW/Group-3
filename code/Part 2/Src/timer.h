@@ -1,22 +1,26 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-uint8_t event_period;	// in ms
+#include "stm32f303xc.h"
+#include <stddef.h>
 
-// enable_timer: enables the STM32F3Discovery timers.
+// timer_init: Sets callback functions for periodic and oneshot, and time delay for each.
+// Also enables the timer and starts it.
+void timer_init(uint16_t desired_period,
+                void (*callback_periodic)(void *args),
+                uint16_t desired_oneshot,
+                void (*cb_oneshot)(void *args));
+
 void enable_timer(void);
 
-// periodic_event: calls callback_function every event_period ms.
-void periodic_event(function callback_function);
+// setters
+void timer_set_period(uint16_t new_period);
+void timer_set_oneshot(uint16_t new_oneshot);
+void timer_set_periodic_callback(void (*callback)(void *args));
+void timer_set_oneshot_callback(void (*callback)(void *args));
 
-// oneshot_event: calls callback_function after delay ms.
-void oneshot_event(uint8_t delay, function callback_function);
-
-// get_timer_period: returns the event_period in this module.
-uint16_t get_timer_period(void);
-
-//set_timer_period: writes new_period argument as event_period.
-void set_timer_period(uint16_t new_period);
-
+// getters
+uint16_t timer_get_period(void);
+uint16_t timer_get_oneshot(void);
 
 #endif
