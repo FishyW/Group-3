@@ -29,7 +29,7 @@ int main(void)
 	// Exercise 2: Timer Interface
 
 	// Exercise 3: Serial interface
-	TestSerial();
+	testSerial();
 
 	// Exercise 4: I2C Sensor Interfacing
 

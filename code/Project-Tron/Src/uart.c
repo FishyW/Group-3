@@ -12,6 +12,7 @@ struct _SerialPort {
 	volatile uint32_t SerialPinSpeedValue;
 	volatile uint32_t SerialPinAlternatePinValueLow;
 	volatile uint32_t SerialPinAlternatePinValueHigh;
+	void (*completion_function)(uint8_t*, uint32_t, uint32_t);
 };
 
 SerialPort USART1_PORT = {USART1,
@@ -23,12 +24,13 @@ SerialPort USART1_PORT = {USART1,
 		0xF00,
 		0x770000,  // for USART1 PC10 and 11, this is in the AFR low register
 		0x00, // no change to the high alternate function register
+		0x00 // default function pointer is NULL
 		};
 
 
-// InitialiseSerial - Initialise the serial port
+// serialInitialise - Initialise the serial port
 // Input: baudRate is from an enumerated set
-void SerialInitialise(uint32_t baudRate, SerialPort *serial_port) {
+void serialInitialise(SerialPort *serial_port, uint32_t baudRate, void (*completion_function)(uint8_t*, uint32_t, uint32_t)) {
 
 
 	// enable clock power, system configuration clock and GPIOC
@@ -86,37 +88,46 @@ void SerialInitialise(uint32_t baudRate, SerialPort *serial_port) {
 	serial_port->UART->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
 }
 
-void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
+void sendByte(SerialPort *serial_port, uint8_t data, void (*callback)()) {
 
 	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
 	}
 
 	serial_port->UART->TDR = data;
+
+	if (callback != 0x00) {
+		callback();
+	}
 }
 
 
-void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+void sendString(SerialPort *serial_port, uint8_t *pt) {
 
 	uint32_t counter = 0;
 	while(*pt) {
-		SerialOutputChar(*pt, serial_port);
+		sendByte(serial_port, *pt, 0x00);
 		counter++;
 		pt++;
 	}
 
 }
 
-void SimpleDelay() {
+void sendMsg(SerialPort *serial_port, uint8_t *buffer, size_t size, uint8_t message_id) {}
+
+void receiveMsg(SerialPort *serial_port) {}
+
+
+void simpleDelay() {
 	// 0xA2C2B -> "666667 clock cycles"
 	// from testing (using a metronome) this is ~1 second
 	for (uint32_t i = 0; i < 0xA2C2B; ++i) {}
 }
 
-void TestSerial() {
-	SerialInitialise(BAUD_9600, &USART1_PORT);
+void testSerial() {
+	serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
 
 	for (;;) {
-		SerialOutputString((uint8_t*)"hello\r\n", &USART1_PORT);
-		SimpleDelay();
+		sendString(&USART1_PORT, (uint8_t*)"hello\r\n");
+		simpleDelay();
 	}
 }
