@@ -1,3 +1,4 @@
+#include "timer.h"
 #include <stdlib.h>
 #include "stm32f303xc.h"
 
@@ -37,11 +38,13 @@ void enable_timer(void) {
 void timer_set_period(uint16_t new_period) {
     event_period = new_period;
     TIM2->ARR    = event_period * 1000;
+    TIM2->CNT = 0;        // or update event
 }
 
 void timer_set_oneshot(uint16_t new_oneshot) {
     event_oneshot = new_oneshot;
     TIM2->CCR1    = event_oneshot * 1000;
+    TIM2->CNT = 0;        // or update event
 }
 
 void timer_set_periodic_callback(void (*callback)(void *args)) {

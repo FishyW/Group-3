@@ -1,85 +1,64 @@
+#include "pwm.h"
 #include <stdlib.h>
 #include "stm32f303xc.h"
+#include "timer.h"
 
-static uint16_t event_period;
-static uint16_t event_oneshot;
 
-static void (*periodic_callback)(void *args) = NULL;
-static void (*oneshot_callback)(void *args)  = NULL;
+// THIS FILE IS LESS EFFICIENT TO ABIDE BY ASSIGNMENT
 
-void timer_init(uint16_t desired_period,
-                void (*callback_periodic)(void *args),
-                uint16_t desired_oneshot,
-                void (*cb_oneshot)(void *args))
+typedef enum {
+    PWM_STATE_HIGH,
+    PWM_STATE_LOW
+} pwm_state_t;
+
+static pwm_state_t state = PWM_STATE_HIGH;
+
+static uint16_t period;
+static uint16_t duty_cycle;
+
+static void (*rising_edge_cb)(void *args) = NULL;
+static void (*falling_edge_cb)(void *args)  = NULL;
+
+void pwm_init(	uint16_t new_pwm_period, uint16_t new_duty_cycle,
+				void (*new_rising_edge_cb)(void *args),
+				void (*new_falling_edge_cb)(void *args))
 {
-    timer_set_period(desired_period);
-    timer_set_periodic_callback(callback_periodic);
-    timer_set_oneshot(desired_oneshot);
-    timer_set_oneshot_callback(cb_oneshot);
+	pwm_set_period(new_pwm_period);
+	pwm_set_duty_cycle(new_duty_cycle);
+	pwm_set_rising_edge_cb(new_rising_edge_cb);
+	pwm_set_falling_edge_cb(new_falling_edge_cb);
 
-    enable_timer();
+	// start timer at duty_cycle period, PWM logic handles the rest
+	timer_init(duty_cycle, pwm_callback, 0, NULL);
 }
 
-void enable_timer(void) {
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-
-    TIM2->PSC   = 7;                      // 1MHz tick rate
-    TIM2->ARR   = event_period * 1000;    // ms to ticks
-    TIM2->CCR1  = event_oneshot * 1000;   // oneshot threshold
-    TIM2->DIER |= TIM_DIER_UIE;           // periodic interrupt
-    TIM2->DIER |= TIM_DIER_CC1IE;         // oneshot interrupt
-    TIM2->CR1  |= TIM_CR1_CEN;
-
-    NVIC_EnableIRQ(TIM2_IRQn);
+void pwm_set_period(uint16_t new_pwm_period){
+	period = new_pwm_period;
 }
 
-// Setters
-void timer_set_period(uint16_t new_period) {
-    event_period = new_period;
-    TIM2->ARR    = event_period * 1000;
+void pwm_set_duty_cycle(uint16_t new_pwm_duty_cycle){
+	duty_cycle = new_pwm_duty_cycle;
 }
 
-void timer_set_oneshot(uint16_t new_oneshot) {
-    event_oneshot = new_oneshot;
-    TIM2->CCR1    = event_oneshot * 1000;
+void pwm_set_rising_edge_cb(void (*new_rising_edge_cb)(void *args)){
+	rising_edge_cb = new_rising_edge_cb;
 }
 
-void timer_set_periodic_callback(void (*callback)(void *args)) {
-    periodic_callback = callback;
+void pwm_set_falling_edge_cb(void (*new_falling_edge_cb)(void *args)){
+	falling_edge_cb = new_falling_edge_cb;
 }
 
-void timer_set_oneshot_callback(void (*callback)(void *args)) {
-    oneshot_callback = callback;
-}
 
-// Getters
-uint16_t timer_get_period(void) {
-    return event_period;
-}
-
-uint16_t timer_get_oneshot(void) {
-    return event_oneshot;
-}
-
-// Interrupt handler.
-void TIM2_IRQHandler(void) {
-	// Check Periodic (ARR)
-    if (TIM2->SR & TIM_SR_UIF) {
-        TIM2->SR &= ~TIM_SR_UIF;	// Clear flag
-
-        if (periodic_callback != NULL) {
-            periodic_callback(NULL);
-        }
-    }
-
-    // Check Oneshot (CC1IF)
-    if (TIM2->SR & TIM_SR_CC1IF) {
-        TIM2->SR  &= ~TIM_SR_CC1IF;		// Clear flag
-        TIM2->DIER &= ~TIM_DIER_CC1IE;  // disable CC1 for oneshot. Otherwise it will repeat every clock reset from ARR.
-
-        if (oneshot_callback != NULL) {
-            oneshot_callback(NULL);
-            oneshot_callback = NULL;	// Double security for oneshot to happen once.
-        }
+void pwm_callback(void *args){
+    if (state == PWM_STATE_HIGH) {
+    	if (rising_edge_cb != NULL) rising_edge_cb(NULL);
+        timer_set_period(duty_cycle);    	// wait for pulse width (e.g. 1500us)
+        state = PWM_STATE_LOW;
+    } else {
+    	if (falling_edge_cb != NULL) falling_edge_cb(NULL);
+        timer_set_period(period - duty_cycle); // wait for remainder of 20ms
+        state = PWM_STATE_HIGH;
     }
 }
+
+

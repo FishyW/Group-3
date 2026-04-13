@@ -16,14 +16,13 @@
  ******************************************************************************
  */
 
+
+/*
+
 #include <stdlib.h>
 #include "stm32f303xc.h"
 
 #include "timer.h"
-
-#if !defined(__SOFT_FP__) && defined(__ARM_FP)
-  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
-#endif
 
 // ════════════════════════════════════════════════════════
 // TEST CODE — put this in main.c
@@ -44,5 +43,42 @@ int main(void) {
 
     while(1) {
         // nothing here — LED toggles in background
+    }
+}
+
+*/
+
+#include "stm32f303xc.h"
+#include "timer.h"
+#include "pwm.h"
+#include <stddef.h>
+
+#if !defined(__SOFT_FP__) && defined(__ARM_FP)
+  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+
+// called when pin goes HIGH
+void on_rising_edge(void *args) {
+    GPIOE->ODR |= (1 << 8);       // PE8 HIGH
+}
+
+// called when pin goes LOW
+void on_falling_edge(void *args) {
+    GPIOE->ODR &= ~(1 << 8);      // PE8 LOW
+}
+
+int main(void) {
+    // enable GPIOE clock
+    RCC->AHBENR  |= RCC_AHBENR_GPIOEEN;
+
+    // set PE8 as output
+    GPIOE->MODER |= (1 << (8 * 2));
+
+    // 20ms period, 1.5ms pulse (centre position)
+    pwm_init(2000, 1000, on_rising_edge, on_falling_edge);
+
+    while(1) {
+        // everything runs in background
     }
 }
