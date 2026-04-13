@@ -152,15 +152,10 @@ void receiveNextByte(SerialPort *serial_port) {
 		metadata->receiveInProgress = 0;
 	}
 
-
-
-
 	// copy the character over to the buffer
 	uint32_t size = metadata->receiveBufferSize;
 	metadata->receiveBuffer[size] = ch;
 	metadata->receiveBufferSize += 1;
-
-
 
 }
 
