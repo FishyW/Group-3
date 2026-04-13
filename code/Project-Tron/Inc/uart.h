@@ -28,14 +28,8 @@ enum {
  * Completion function specifies the function called after a message buffer is received
  * The data buffer, the size of the data buffer and the message id is passed into the callback
  */
-void serialInitialise(SerialPort *serial_port, uint32_t baudRate, void (*completion_function)(uint8_t*, uint32_t, uint32_t));
+void serialInitialise(SerialPort *serial_port, uint32_t baudRate, void (*completion_function)(uint8_t*, uint8_t, uint8_t));
 
-/*
- * Sends a byte asynchronously over the serial port
- * This function is non blocking and uses interrupts
- * The callback is called after a character has been successfully sent
- */
-void sendByte(SerialPort *serial_port, uint8_t pt, void (*callback)());
 
 /*
  * Sends a string asynchronously over the serial port
@@ -43,7 +37,7 @@ void sendByte(SerialPort *serial_port, uint8_t pt, void (*callback)());
  * If it hasn't been sent, this function will spin until it sees that the previous buffer has been sent
  * If it has been sent, this function will then send the string asynchronously
  */
-void sendString(SerialPort *serial_port, uint8_t *pt);
+void sendString(SerialPort *serial_port, char* string);
 
 /*
  * Sends a buffer asynchronously over the serial port
@@ -53,7 +47,7 @@ void sendString(SerialPort *serial_port, uint8_t *pt);
  *
  * To use this function make sure to cast the buffer to uint8_t*
  */
-void sendMsg(SerialPort *serial_port, uint8_t *buffer, size_t size, uint8_t message_id);
+void sendMsg(SerialPort *serial_port, uint8_t *buffer, uint8_t size, uint8_t message_id);
 
 
 /*
