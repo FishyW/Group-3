@@ -358,10 +358,17 @@ void receiveMsg(SerialPort *serial_port) {
 		return;
 	}
 
+	// copy the buffer, since our interrupt might overwrite our old buffer
+	uint8_t new_buffer[MAX_UART_BUFFER];
+	for (int i = 3; i < size + 3; ++i) {
+		new_buffer[i-3] = buffer[i];
+	}
+
+	uint8_t message_id = buffer[2];
 	__enable_irq();
 	// call the completion function passed in
 	if (serial_port->completion_function != 0x00) {
-		serial_port->completion_function(buffer + 3, size, buffer[2]);
+		serial_port->completion_function(new_buffer, size, message_id);
 	}
 }
 
