@@ -1,7 +1,24 @@
 // integration file for board 2
 #include "integration.h"
+#include <stdint.h>
 
 void initializeBoardB() {
+
+}
+
+void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
+	uint8_t buttonState = 0;
+
+	// Winston
+	// read and parse mag/button state data
+
+	if (buttonState == 1) {
+		// Jack
+		// change LED state based on magnetometer
+	} else {
+		// Denny
+		// change servo state based on magentometer
+	}
 
 }
 
@@ -18,18 +35,7 @@ void runBoardB() {
 	initializeBoardB();
 
 	while (1) {
-			uint8_t buttonState = 0;
-			// Winston
-			// read and parse mag/button state data
-
-			if (buttonState == 1) {
-				// Jack
-				// change LED state based on magnetometer
-			} else {
-				// Denny
-				// change servo state based on magentometer
-			}
-
+			// call receiveMsg here
 
 		}
 }
