@@ -226,10 +226,10 @@ void serialInitialise(SerialPort *serial_port, uint32_t baudRate, void (*complet
 	RCC->AHBENR |= serial_port->MaskAHBENR;
 
 	// set pin mode to alternate function for the specific GPIO pins
-	serial_port->GPIO->MODER = serial_port->SerialPinModeValue;
+	serial_port->GPIO->MODER |= serial_port->SerialPinModeValue;
 
 	// enable high speed clock for specific GPIO pins
-	serial_port->GPIO->OSPEEDR = serial_port->SerialPinSpeedValue;
+	serial_port->GPIO->OSPEEDR |= serial_port->SerialPinSpeedValue;
 
 	// set alternate function to enable USART to external pins
 	serial_port->GPIO->AFR[0] |= serial_port->SerialPinAlternatePinValueLow;
