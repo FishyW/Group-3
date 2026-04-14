@@ -20,6 +20,8 @@
 
 #include "uart.h"
 
+#include "integration.h"
+
 int main(void)
 {
 

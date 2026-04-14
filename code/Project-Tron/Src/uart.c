@@ -15,6 +15,29 @@
 #define STX_CHARACTER 0x02
 #define ETX_CHARACTER 0x03
 
+typedef struct ReceiverBufferMetadata {
+	uint8_t receiveBuffer[MAX_UART_BUFFER];
+	uint32_t receiveBufferSize;
+	uint8_t receiveError;
+} ReceiverBufferMetadata;
+
+// note that switch buffer must be called by the kernel, since the kernel
+// can't be interrupted by the user
+typedef struct ReceiverDoubleBuffer {
+	// when the kernel has finished processing data writeFinished == 1
+	// kernel sets writeFinished to 0 or 1
+	uint8_t writeFinished;
+	// when the user has finished reading the data readReady == 1
+	// kernel sets readFinished to 0, user sets readFinished to 1
+	uint8_t readFinished;
+
+	// kernel index specifies the index of the interrupt (i.e. "kernel")
+	// index of the main progream (i.e. "user") is 1 - kernelIndex
+	uint8_t kernelIndex;
+	ReceiverBufferMetadata buffers[2];
+} ReceiverDoubleBuffer;
+
+
 typedef struct UARTMetadata {
 	uint8_t* sendBuffer;
 	uint32_t sendBufferIndex;
