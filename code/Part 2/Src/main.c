@@ -57,26 +57,32 @@ int main(void) {
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+void setup_GPIO_for_test(void){
+	// Set mode
+	// Use GPIOA
+	RCC->AHBENR |= RCC_AHBENR_GPIODEN | RCC_AHBENR_GPIOEEN;
+	// set PE8 as output
+    GPIOE->MODER |= (GPIO_MODER_MODER8_0);
+    GPIOD->MODER |= (GPIO_MODER_MODER6_0);
+}
 
 // called when pin goes HIGH
 void on_rising_edge(void *args) {
     GPIOE->ODR |= (1 << 8);       // PE8 HIGH
+    GPIOD->ODR |= (1 << 6);       // PB6 HIGH
 }
 
 // called when pin goes LOW
 void on_falling_edge(void *args) {
     GPIOE->ODR &= ~(1 << 8);      // PE8 LOW
+    GPIOD->ODR &= ~(1 << 6);      // PB6 LOW
 }
 
 int main(void) {
-    // enable GPIOE clock
-    RCC->AHBENR  |= RCC_AHBENR_GPIOEEN;
-
-    // set PE8 as output
-    GPIOE->MODER |= (1 << (8 * 2));
+	setup_GPIO_for_test();
 
     // 20ms period, 1.5ms pulse (centre position)
-    pwm_init(20, 1.5, on_rising_edge, on_falling_edge);
+    pwm_init(20, 2, on_rising_edge, on_falling_edge);
 
     while(1) {
         // everything runs in background

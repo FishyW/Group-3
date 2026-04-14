@@ -34,6 +34,13 @@ void enable_timer(void) {
     NVIC_EnableIRQ(TIM2_IRQn);
 }
 
+timer_do_oneshot_function(	uint16_t desired_oneshot,
+        					void (*cb_oneshot)(void *args)){
+	timer_set_oneshot(desired_oneshot);
+	timer_set_oneshot_callback(cb_oneshot);
+	TIM2->CNT = 0;
+}
+
 // Setters
 void timer_set_period(uint16_t new_period) {
     event_period = new_period;
