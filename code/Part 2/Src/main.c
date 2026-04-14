@@ -76,7 +76,7 @@ int main(void) {
     GPIOE->MODER |= (1 << (8 * 2));
 
     // 20ms period, 1.5ms pulse (centre position)
-    pwm_init(2000, 1000, on_rising_edge, on_falling_edge);
+    pwm_init(20, 1.5, on_rising_edge, on_falling_edge);
 
     while(1) {
         // everything runs in background

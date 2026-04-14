@@ -1,0 +1,6 @@
+../Src/pwm.c:22:6:pwm_init	24	static
+../Src/pwm.c:35:6:pwm_set_period	16	static
+../Src/pwm.c:39:6:pwm_set_duty_cycle	16	static
+../Src/pwm.c:43:6:pwm_set_rising_edge_cb	16	static
+../Src/pwm.c:47:6:pwm_set_falling_edge_cb	16	static
+../Src/pwm.c:52:6:pwm_callback	16	static

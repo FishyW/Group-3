@@ -1,0 +1,10 @@
+C:/Users/Denny/Desktop/MTRX2700/MTRX2700 Repo/MTRX2700-2026/stm32f303-definitions/Core/Inc/core_cm4.h:1688:22:__NVIC_EnableIRQ	2
+../Src/timer.c:11:6:timer_init	1
+../Src/timer.c:24:6:enable_timer	1
+../Src/timer.c:38:6:timer_set_period	1
+../Src/timer.c:44:6:timer_set_oneshot	1
+../Src/timer.c:50:6:timer_set_periodic_callback	1
+../Src/timer.c:54:6:timer_set_oneshot_callback	1
+../Src/timer.c:59:10:timer_get_period	1
+../Src/timer.c:63:10:timer_get_oneshot	1
+../Src/timer.c:68:6:TIM2_IRQHandler	5
