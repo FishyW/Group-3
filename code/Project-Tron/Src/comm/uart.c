@@ -483,3 +483,14 @@ void testSerial() {
 		simpleDelay();
 	}
 }
+
+void testSerialString() {
+	// pass in 0x00 NULL callback
+	serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
+
+	for (;;) {
+		// sends "hello" through UART port
+		sendString(&USART1_PORT, "hello\r\n");
+		simpleDelay();
+	}
+}

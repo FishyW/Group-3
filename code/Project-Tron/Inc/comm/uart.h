@@ -70,4 +70,6 @@ void receiveMsg(SerialPort *serial_port);
 
 void testSerial();
 
+void testSerialString();
+
 #endif
