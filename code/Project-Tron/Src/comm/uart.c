@@ -26,8 +26,13 @@ typedef struct ReceiverDoubleBuffer {
 	// when the kernel has finished processing data writeFinished == 1
 	// kernel sets writeFinished to 0 or 1
 	uint8_t writeFinished;
-	// when the user has finished reading the data readFinished == 1
-	// kernel sets readFinished to 0, user sets readFinished to 1
+
+
+	// used to determine whether the reading is in progress
+	// if user is currently reading, the kernel will not switch the buffer
+	// this effectively acts like a mutex
+	uint8_t readStarted;
+
 	uint8_t readFinished;
 
 	// kernel index specifies the index of the interrupt (i.e. "kernel")
@@ -124,12 +129,14 @@ void sendNextByte(SerialPort *serial_port) {
 }
 
 void switchBuffer(ReceiverDoubleBuffer* doubleBuffer) {
-	// switch the buffer when both the kernel and the user has finished reading
-	// and writing
-	if (doubleBuffer->readFinished && doubleBuffer->writeFinished) {
-		doubleBuffer->readFinished = 0;
+	// switch the buffer when both the kernel and the user is not reading the buffer
+	// and the kernel has finished writing to the buffer
+	// this way the user will always get the latest data
+	if ((doubleBuffer->readFinished || !doubleBuffer->readStarted)  && doubleBuffer->writeFinished) {
 		doubleBuffer->writeStarted = 0;
 		doubleBuffer->writeFinished = 0;
+		doubleBuffer->readStarted = 0;
+		doubleBuffer->readFinished = 0;
 
 		doubleBuffer->kernelIndex = 1 - doubleBuffer->kernelIndex;
 	}
@@ -154,6 +161,11 @@ ReceiverBufferMetadata* getBuffer(ReceiverDoubleBuffer* doubleBuffer, uint8_t is
 		return doubleBuffer->buffers + doubleBuffer->kernelIndex;
 	}
 	return doubleBuffer->buffers + (1 - doubleBuffer->kernelIndex);
+}
+
+
+void startBufferRead(ReceiverDoubleBuffer* doubleBuffer) {
+	doubleBuffer->readStarted = 1;
 }
 
 // SIGNALS THAT THE USER HAS FINISHED READING THE BUFFER
@@ -194,6 +206,7 @@ void receiveNextByte(SerialPort *serial_port) {
 	// if the 1st charac is STX
 	// if the write hasn't started STX is first character
 	// if the write has finished STX is also the first character
+	// in this case the buffer always has the latest data
 	if (ch == STX_CHARACTER && (!doubleBuffer->writeStarted || doubleBuffer->writeFinished)) {
 		// if buffer has been written, but there's a new incoming message
 		// set the buffer to not write finished, and replace the buffer with the new message
@@ -358,8 +371,10 @@ void serialInitialise(SerialPort *serial_port, uint32_t baudRate, void (*complet
 
 	serial_port->completion_function = completion_function;
 
-	// set read finished to 1, since if read finished is 1, the user will spin
+	// ensures that the reader spins in the beginning
+	// while waiting for the writer to write to the buffer
 	serial_port->metadata.doubleBuffer.readFinished = 1;
+	serial_port->metadata.doubleBuffer.readStarted = 1;
 }
 
 
@@ -425,10 +440,18 @@ void receiveMsg(SerialPort *serial_port) {
 	UARTMetadata* metadataAll = &serial_port->metadata;
 	ReceiverDoubleBuffer* doubleBuffer = &metadataAll->doubleBuffer;
 
-	// if nothing is in the buffer, buffer is in state "read finished"
-	// once the kernel has switched the buffer the state transitions to read not finished
-	// in which case we read it
+	// keep looping until there's data available for the user
+	// when data is available, readFinished will be reset to 0
 	while (doubleBuffer->readFinished == 1) {};
+
+	// let's say it interrupts here
+	// then it switches the buffer, this is OKAY since everytime it switches
+	// its guaranteed that the received message is valid and ready to be read
+
+	startBufferRead(doubleBuffer);
+
+	// past here, any attempts to switch the buffer will be blocked
+	// since startBufferRead puts "read in progress"
 
 	// read the buffer as a user
 	ReceiverBufferMetadata* metadata = getBuffer(doubleBuffer, 0);
@@ -490,7 +513,7 @@ void testSerial() {
 
 	for (;;) {
 		// port, buffer, length of buffer, message id (good to define message id enum somewhere)
-		// sendMsg(&USART1_PORT, (uint8_t*) "hello\r\n", 8, 2);
+		sendMsg(&USART1_PORT, (uint8_t*) "hello\r\n", 8, 2);
 		receiveMsg(&USART1_PORT);
 		delayElapsed(1000);
 	}
