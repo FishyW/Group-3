@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include "comm/uart.h"
+#include "sensors/gyro.h"
 
 #include "integration.h"
 
@@ -31,11 +32,11 @@ int main(void)
 	// Exercise 2: Timer Interface
 
 	// Exercise 3: Serial interface
-//	testSerial();
-	testSerialString();
+	// testSerial();
+	// testSerialString();
 
 	// Exercise 4: I2C Sensor Interfacing
-	// testGyro();
+	testGyro();
 
 	// Exercise 5: Integration Task
 
