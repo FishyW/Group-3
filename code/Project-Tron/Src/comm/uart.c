@@ -463,11 +463,7 @@ void receiveMsg(SerialPort *serial_port) {
 }
 
 
-void simpleDelay() {
-	// 0xA2C2B -> "666667 clock cycles"
-	// from testing (using a metronome) this is ~1 second
-	for (uint32_t i = 0; i < 0xA2C2B; ++i) {}
-}
+
 
 void serialCallback(uint8_t* buffer, uint8_t size, uint8_t id) {
 	// empty function, put a breakpoint here to see this working
