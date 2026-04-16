@@ -149,24 +149,24 @@ int magReadSample(MagSample *s)
  * --------------------------------------------------------------- */
 void magPrintSample(const MagSample *s)
 {
-    if ((s == 0) || (s->valid == 0U))
-        return;
-
-    /* Print timestamp first so each line is self-contained */
-    uartSendString("T=");
-    uartSendUInt(s->timestamp_ms);
-    uartSendString("ms  ");
-
-    /* Raw axis values */
-    uartSendString("X=");
-    uartSendInt(s->raw_x);
-    uartSendString("  Y=");
-    uartSendInt(s->raw_y);
-    uartSendString("  Z=");
-    uartSendInt(s->raw_z);
-
-    /* Decoded heading */
-    uartSendString("  Heading=");
-    uartSendFixed2(s->heading_deg);
-    uartSendString(" deg\r\n");
+//    if ((s == 0) || (s->valid == 0U))
+//        return;
+//
+//    /* Print timestamp first so each line is self-contained */
+//    uartSendString("T=");
+//    uartSendUInt(s->timestamp_ms);
+//    uartSendString("ms  ");
+//
+//    /* Raw axis values */
+//    uartSendString("X=");
+//    uartSendInt(s->raw_x);
+//    uartSendString("  Y=");
+//    uartSendInt(s->raw_y);
+//    uartSendString("  Z=");
+//    uartSendInt(s->raw_z);
+//
+//    /* Decoded heading */
+//    uartSendString("  Heading=");
+//    uartSendFixed2(s->heading_deg);
+//    uartSendString(" deg\r\n");
 }
