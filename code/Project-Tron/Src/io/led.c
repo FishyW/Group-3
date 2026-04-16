@@ -1,5 +1,5 @@
-#include "led.h"
-#include "gpio.h"
+#include "io/led.h"
+#include "io/gpio.h"
 
 // Private GPIO objects for the 8 LEDs
 static gpio_t leds[8];

@@ -1,7 +1,7 @@
 #include <math.h>
-#include "magnetometer.h"
-#include "i2c.h"
-#include "uart.h"
+#include "sensors/magnetometer.h"
+#include "comm/i2c.h"
+#include "comm/uart.h"
 
 extern volatile uint32_t tick_ms;
 

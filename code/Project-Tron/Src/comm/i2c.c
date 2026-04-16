@@ -19,7 +19,7 @@
  */
 
 #include "stm32f303xc.h"
-#include "i2c.h"
+#include "comm/i2c.h"
 
 /* tick_ms is defined in main.c and used here for timeouts */
 extern volatile uint32_t tick_ms;

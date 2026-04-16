@@ -1,4 +1,4 @@
-#include "gpio.h"
+#include "io/gpio.h"
 
 // Helper function to enable the peripheral clock for a given GPIO port
 static void gpio_enable_clock(GPIO_TypeDef *port) {

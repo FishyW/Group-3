@@ -4,7 +4,7 @@
  * TO DO: Replace completion function with LED display
  */
 
-#include "uart.h"
+#include "comm/uart.h"
 
 #include "stm32f303xc.h"
 #include <string.h>

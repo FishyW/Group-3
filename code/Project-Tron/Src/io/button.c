@@ -1,5 +1,5 @@
-#include "button.h"
-#include "gpio.h"
+#include "io/button.h"
+#include "io/gpio.h"
 #include "stm32f303xc.h"
 
 // Private GPIO object for the button

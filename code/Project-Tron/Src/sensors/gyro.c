@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "gyro.h"
+#include "sensors/gyro.h"
 
-#include "gpio.h"
-#include "uart.h"
+#include "io/gpio.h"
+#include "comm/uart.h"
 
 #define GYRO_WHO_AM_I_REG 0xF
 #define GYRO_CTRL_REG1 0x20

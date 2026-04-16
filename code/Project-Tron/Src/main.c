@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 
-#include "uart.h"
+#include "comm/uart.h"
 
 #include "integration.h"
 
