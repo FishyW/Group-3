@@ -21,8 +21,37 @@ void timer_set_delay_cb(void (*callback)(void *args));
 uint16_t timer_get_period(void);
 uint16_t timer_get_delay(void);
 
+// get the counter's value (time elapsed in microseconds)
+uint32_t timer_get_elapsed(void);
+
 // Advanced Functionality
 void timer_oneshot_call(uint16_t user_delay,
                         void (*user_delay_cb)(void *args));
+
+
+void initElapsedTimer();
+
+// get the current time relative to when initElapsedTimer is called
+// the unit is in microseconds
+uint32_t getNow();
+
+// get the time that has passed between getElapsed function calls
+// the unit is in microseconds
+uint32_t getElapsed();
+
+/*
+ * The delay functions below takes in time in milliseconds
+ * And waits until the specified time has passed
+ */
+
+// delay for time amount of milliseconds
+// variant that uses elapsed time
+// before calling this initElapsedTimer must already be called!
+void delayElapsed(uint16_t time);
+
+// variant that doesn't use elapsed time
+// it uses one shot
+void delay(uint16_t time);
+
 
 #endif
