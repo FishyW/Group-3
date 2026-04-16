@@ -1,13 +1,10 @@
-/**
- * TO DO: If RX receives overrun error, display error in the LED
- * TO DO: If message buffer is invalid, display error in LED
- * TO DO: Replace completion function with LED display
- */
-
 #include "comm/uart.h"
 
 #include "stm32f303xc.h"
 #include <string.h>
+#include "timer.h"
+#include "io/led.h"
+
 
 
 #define MAX_UART_BUFFER 256
@@ -64,6 +61,17 @@ struct _SerialPort {
 	void (*completion_function)(uint8_t*, uint8_t, uint8_t);
 };
 
+
+// helper function to flash leds
+void flashLeds() {
+	for (int i = 0; i < 3; ++i) {
+		led_set_all(0xFF);
+		delayElapsed(1000);
+		led_set_all(0x0);
+		delayElapsed(1000);
+	}
+
+}
 
 SerialPort USART1_PORT = {
 		{0},
@@ -165,7 +173,6 @@ void finishBufferWrite(ReceiverDoubleBuffer* doubleBuffer) {
 }
 
 
-
 void receiveNextByte(SerialPort *serial_port) {
 	UARTMetadata* metadataAll = &serial_port->metadata;
 	ReceiverDoubleBuffer* doubleBuffer = &metadataAll->doubleBuffer;
@@ -176,6 +183,7 @@ void receiveNextByte(SerialPort *serial_port) {
 		return;
 	}
 
+
 	// read the buffer as the kernel
 	ReceiverBufferMetadata* metadata = getBuffer(doubleBuffer, 1);
 
@@ -183,8 +191,10 @@ void receiveNextByte(SerialPort *serial_port) {
 	uint8_t ch =  (uint8_t) serial_port->UART->RDR;
 
 
-	// if the 1st charac is STX (i.e. buffer
-	if (ch == STX_CHARACTER && !doubleBuffer->writeStarted) {
+	// if the 1st charac is STX
+	// if the write hasn't started STX is first character
+	// if the write has finished STX is also the first character
+	if (ch == STX_CHARACTER && (!doubleBuffer->writeStarted || doubleBuffer->writeFinished)) {
 		// if buffer has been written, but there's a new incoming message
 		// set the buffer to not write finished, and replace the buffer with the new message
 		startBufferWrite(doubleBuffer);
@@ -428,20 +438,22 @@ void receiveMsg(SerialPort *serial_port) {
 	uint8_t size = metadata->receiveBufferSize - 5;
 
 	// VALIDATION CHECKS:
-	// set LED when validation checks fail
 
 	// check if receive error encountered
 	if (metadata->receiveError) {
+		flashLeds();
 		return finishBufferRead(doubleBuffer);
 	}
 
 	// validation check: check if the buffer length is as claimed
 	if (size + 5 != buffer[1]) {
+		flashLeds();
 		return finishBufferRead(doubleBuffer);
 	}
 
 	// check the checksum is valid
 	if (bcc_checksum(buffer, size + 4) != buffer[size+4]) {
+		flashLeds();
 		return finishBufferRead(doubleBuffer);
 	}
 
@@ -464,29 +476,37 @@ void receiveMsg(SerialPort *serial_port) {
 
 
 
-
+uint32_t counter = 0;
 void serialCallback(uint8_t* buffer, uint8_t size, uint8_t id) {
 	// empty function, put a breakpoint here to see this working
+	counter += 1;
+	led_set_all(counter);
 }
 
 void testSerial() {
 	serialInitialise(&USART1_PORT, BAUD_9600, serialCallback);
+	initElapsedTimer();
+	led_init();
 
 	for (;;) {
 		// port, buffer, length of buffer, message id (good to define message id enum somewhere)
-		sendMsg(&USART1_PORT, (uint8_t*) "hello\r\n", 8, 2);
+		// sendMsg(&USART1_PORT, (uint8_t*) "hello\r\n", 8, 2);
 		receiveMsg(&USART1_PORT);
-		simpleDelay();
+		delayElapsed(1000);
 	}
+
+
 }
 
 void testSerialString() {
 	// pass in 0x00 NULL callback
 	serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
+	initElapsedTimer();
+	led_init();
 
 	for (;;) {
 		// sends "hello" through UART port
 		sendString(&USART1_PORT, "hello\r\n");
-		simpleDelay();
+		delayElapsed(1000);
 	}
 }

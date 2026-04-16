@@ -41,11 +41,11 @@ int main(void)
 	// Exercise 2: Timer Interface
 
 	// Exercise 3: Serial interface
-	// testSerial();
+	testSerial();
 	// testSerialString();
 
 	// Exercise 4: I2C Sensor Interfacing
-	testGyro();
+	// testGyro();
 
 	// Exercise 5: Integration Task
 

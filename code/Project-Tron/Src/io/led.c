@@ -73,6 +73,7 @@ void led_set_all(uint8_t mask) {
     }
 }
 
+
 // Example of a timer-driven update function for the advanced task
 // This would be called periodically by a timer module
 void led_timer_callback(void) {

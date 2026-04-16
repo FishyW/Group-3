@@ -43,6 +43,8 @@ uint8_t delayFlag = 0;
 void delayCallback(void* value) {
 	delayFlag = 1;
 }
+
+
 void delay(uint16_t time) {
 	delayFlag = 0;
 	timer_oneshot_call(time, delayCallback);
