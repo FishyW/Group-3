@@ -13,6 +13,8 @@ typedef struct {
 
 void initializeAccel();
 
+void readAccel(AccelRawData* data);
+
 void testAccel();
 
 #endif

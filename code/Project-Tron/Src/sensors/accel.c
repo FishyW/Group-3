@@ -100,6 +100,5 @@ void testAccel() {
 		delayElapsed(10);
 	}
 
-	// i2cWriteReg(uint8_t addr7, uint8_t reg, uint8_t data);
 
 }

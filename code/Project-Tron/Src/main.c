@@ -21,8 +21,12 @@
 #include <stdint.h>
 
 #include "comm/uart.h"
+
 #include "sensors/gyro.h"
 #include "sensors/accel.h"
+#include "sensors/attitude.h"
+
+
 #include "timer.h"
 
 #include "integration.h"
@@ -56,7 +60,9 @@ int main(void)
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
-	testAccel();
+	// testAccel();
+	testAttitude();
+
 	// Exercise 5: Integration Task
 
 

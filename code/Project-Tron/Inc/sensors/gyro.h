@@ -14,4 +14,6 @@ void initializeGyro();
 
 void testGyro();
 
+void readGyro(GyroRawData* data);
+
 #endif
