@@ -18,7 +18,7 @@ void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
 	} else {
 		// Denny
 		// change servo state based on magentometer
-		pwm_init(20, servo_state, GPIO_write_HIGH, GPIO_write_LOW);
+		// pwm_init(20, servo_state, GPIO_write_HIGH, GPIO_write_LOW);
 	}
 
 }
