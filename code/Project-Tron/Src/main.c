@@ -22,14 +22,24 @@
 
 #include "comm/uart.h"
 #include "sensors/gyro.h"
+#include "sensors/accel.h"
 #include "timer.h"
 
 #include "integration.h"
+
+volatile uint32_t tick_ms = 0;
+
 
 void SystemInit(void) {
 	#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
 	  SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
 	#endif
+}
+
+///* SysTick interrupt runs every 1 ms */
+void SysTick_Handler(void)
+{
+    tick_ms++;
 }
 
 int main(void)
@@ -41,12 +51,12 @@ int main(void)
 	// Exercise 2: Timer Interface
 
 	// Exercise 3: Serial interface
-	testSerial();
+	// testSerial();
 	// testSerialString();
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
-
+	testAccel();
 	// Exercise 5: Integration Task
 
 
