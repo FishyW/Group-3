@@ -6,7 +6,6 @@
 extern volatile uint32_t tick_ms;
 
 /* PI used for the heading conversion from radians to degrees */
-#define PI_F  3.14159265358979f
 
 /* ---------------------------------------------------------------
  * magInit
@@ -28,16 +27,18 @@ int magInit(void)
 {
     /* ---- CFG_REG_A_M = 0x80 ----
      * Bit 7   : TEMP_COMP_EN = 1  --> temperature compensation enabled
-     * Bits 4:2: ODR / LP settings --> 10 Hz, high-resolution mode
+     * Bits 4:2: ODR / LP settings
      * Bits 1:0: MD = 00           --> continuous-conversion mode
      */
-    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_A_M, 0x80U))
+	// ODR = 11 -> 100Hz (same frequency as accelerometer)
+    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_A_M, 0b10001100))
         return 0;
 
     /* ---- CFG_REG_B_M = 0x00 ----
-     * All default; offset cancellation is left off.
      */
-    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_B_M, 0x00U))
+    // LPF = 1 (enable low pass filter): bit 0
+    // OFF_CANC = 1 (set offset cancellation to prevent drift = 1): bit 1
+    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_B_M, 0b00000011))
         return 0;
 
     /* ---- CFG_REG_C_M = 0x10 ----
@@ -45,7 +46,7 @@ int magInit(void)
      *                     not updated until both H and L have been read.
      *                     Prevents mixing of old H and new L bytes.
      */
-    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_C_M, 0x10U))
+    if (!i2cWriteReg(MAG_ADDR_7BIT, AGR_CFG_REG_C_M, 0b00010000))
         return 0;
 
     return 1;
@@ -54,8 +55,12 @@ int magInit(void)
 /* ---------------------------------------------------------------
  * magHeadingDeg  (private helper)
  *
- * Computes the compass heading in degrees [0, 360) from raw X and Y
+ * Computes the compass heading in degrees [-180, 180) from raw X and Y
  * axis counts using the two-argument arctangent.
+ *
+ * 0 corresponds to North, 90 corresponds to East
+ * Due to electromagnetic disturbance, the heading might be inaccurate
+ * Thus it is recommended to position the STM32 far away from any electronic device
  *
  * atan2f returns a value in (-pi, +pi] radians.
  * Negative results are shifted up by 360 degrees.
@@ -65,11 +70,7 @@ int magInit(void)
  * --------------------------------------------------------------- */
 static float magHeadingDeg(int16_t x, int16_t y)
 {
-    float heading = atan2f((float)y, (float)x) * (180.0f / PI_F);
-
-    /* Normalise to [0, 360) */
-    if (heading < 0.0f)
-        heading += 360.0f;
+    float heading = atan2f((float)-x, (float)-y) * (180.0f / M_PI);
 
     return heading;
 }
@@ -125,9 +126,11 @@ int magReadSample(MagSample *s)
      * LSM303AGR stores L byte at lower address, H byte at higher address.
      * The cast to int16_t sign-extends the result correctly.
      */
-    s->raw_x = (int16_t)((raw[1] << 8) | raw[0]);   /* X: raw[1]=H, raw[0]=L */
-    s->raw_y = (int16_t)((raw[3] << 8) | raw[2]);   /* Y: raw[3]=H, raw[2]=L */
-    s->raw_z = (int16_t)((raw[5] << 8) | raw[4]);   /* Z: raw[5]=H, raw[4]=L */
+
+    // From application note, multiply by 1.5
+    s->raw_x = (int16_t)((raw[1] << 8) | raw[0]) * 1.5;   /* X: raw[1]=H, raw[0]=L */
+    s->raw_y = (int16_t)((raw[3] << 8) | raw[2]) * 1.5;   /* Y: raw[3]=H, raw[2]=L */
+    s->raw_z = (int16_t)((raw[5] << 8) | raw[4]) * 1.5;   /* Z: raw[5]=H, raw[4]=L */
 
     /* ---- Compute heading and record timestamp ---- */
     s->heading_deg  = magHeadingDeg(s->raw_x, s->raw_y);

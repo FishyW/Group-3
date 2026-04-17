@@ -44,7 +44,7 @@ void testAttitude() {
 		if (getNow() - start >= 200 * 1000) {
 			start = getNow();
 			char string[50];
-			snprintf(string, sizeof(string), "%.2f, %.2f\r\n", thetax, thetay);
+			snprintf(string, sizeof(string), "%d, %d, %d, %.2f\r\n", mag.raw_x, mag.raw_y, mag.raw_z, mag.heading_deg);
 			sendString(&USART1_PORT, string);
 		}
 

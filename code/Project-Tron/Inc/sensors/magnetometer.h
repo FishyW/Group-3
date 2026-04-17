@@ -25,6 +25,7 @@
 #define AGR_OUTX_L_REG_M 0x68U
 
 /* One magnetometer sample */
+// X, Y, Z are in mG (milliGauss)
 typedef struct
 {
     int16_t  raw_x;         /* raw X reading */
