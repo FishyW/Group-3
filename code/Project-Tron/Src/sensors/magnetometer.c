@@ -63,7 +63,6 @@ int magInit(void)
  * Thus it is recommended to position the STM32 far away from any electronic device
  *
  * atan2f returns a value in (-pi, +pi] radians.
- * Negative results are shifted up by 360 degrees.
  *
  * Note: this is only a horizontal-plane heading calculation.
  * If the board is tilted, the result will drift.

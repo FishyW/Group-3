@@ -61,7 +61,7 @@ int main(void)
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
-	// testAccel();
+	//testAccel();
 	testAttitude();
 
 	// Exercise 5: Integration Task
