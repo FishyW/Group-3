@@ -70,7 +70,7 @@ int magInit(void)
  * --------------------------------------------------------------- */
 static float magHeadingDeg(int16_t x, int16_t y)
 {
-    float heading = atan2f((float)-x, (float)-y) * (180.0f / M_PI);
+    float heading = atan2f((float)x, (float)y) * (180.0f / M_PI);
 
     return heading;
 }
