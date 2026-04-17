@@ -15,7 +15,7 @@
 #define BUFFER_SIZE 10
 
 // if velocity is >= 1m/s => increment using gyro
-#define DELTAX_SQUARED_THRESHOLD 0.1
+#define DELTAX_SQUARED_THRESHOLD 0.05
 
 typedef struct {
 	float data[BUFFER_SIZE];
@@ -71,22 +71,26 @@ void attitudeFromAccelAndMag(Attitude* attitude) {
 	float thetaz = atan2(-by, bx);
 
 	// from the sensor POV pitch and roll are swapped
-	attitude->p = thetax * 180/M_PI;
-	attitude->r = thetay * 180/M_PI;
+	// want roll left to be negative (i.e. opposite of this)
+	// want pitch forward to be negative (i.e. opposite of this)
+	attitude->p = -thetax * 180/M_PI;
+	attitude->r = -thetay * 180/M_PI;
 	attitude->y = thetaz * 180/M_PI;
 }
 
-void deltaAttitudeFromGyro(Attitude* attitude) {
+void deltaAttitudeFromGyro(Attitude* attitude, float* dt) {
 	GyroRawData vel = {};
 	readGyro(&vel);
 
 	// time elapsed in microseconds
-	uint32_t time = getElapsed();
+	float time = ((float) getElapsed())/1000000;
 
 	// from the sensor POV pitch and roll are swapped
-	attitude->p = (vel.x * time)/1000000;
-	attitude->r = (vel.y * time)/1000000;
-	attitude->y = (vel.z * time)/1000000;
+	attitude->p = vel.x * time;
+	attitude->r = vel.y * time;
+	attitude->y = vel.z * time;
+
+	*dt = time;
 
 }
 
@@ -102,6 +106,7 @@ void testAttitude() {
 
 	CircularBuffer dXBuffer = {};
 	Attitude previousAttitude = {0,0,0};
+	Attitude previousAccelMagAttitude = {0,0,0};
 
 	while (1) {
 
@@ -117,12 +122,19 @@ void testAttitude() {
 
 		attitudeFromAccelAndMag(&attitudeMagAccel);
 
-		deltaAttitudeFromGyro(&deltaAttitudeGyro);
+		float dt = 0;
+		deltaAttitudeFromGyro(&deltaAttitudeGyro, &dt);
 
 		Attitude finalAttitude;
 
 		// check stability
-		float dX2 = pow(deltaAttitudeGyro.p,2) + pow(deltaAttitudeGyro.r, 2) + pow(deltaAttitudeGyro.y,2);
+
+		// first convert accelmag readings to deltas
+		float deltaR = (attitudeMagAccel.r - previousAccelMagAttitude.r) * dt;
+		float deltaP =(attitudeMagAccel.p - previousAccelMagAttitude.p) * dt;
+		float deltaY =(attitudeMagAccel.y - previousAccelMagAttitude.y) * dt;
+
+		float dX2 = pow(deltaR,2) + pow(deltaP, 2) + pow(deltaY,2);
 		pushBuffer(&dXBuffer, dX2);
 
 		float stability = maxElement(&dXBuffer);
@@ -136,13 +148,14 @@ void testAttitude() {
 		}
 
 		previousAttitude = finalAttitude;
+		previousAccelMagAttitude = attitudeMagAccel;
 
 		// rate limit sending string
 		// send every 200ms
 
 		if (getNow() - start >= 200 * 1000) {
 			start = getNow();
-			char string[50];
+			char string[100];
 			 snprintf(string, sizeof(string), "Roll: %.2f, Pitch: %.2f, Yaw: %.2f\r\n",
 					finalAttitude.r, finalAttitude.p, finalAttitude.y);
 			sendString(&USART1_PORT, string);
