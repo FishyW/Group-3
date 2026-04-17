@@ -53,5 +53,10 @@ void delayElapsed(uint16_t time);
 // it uses one shot
 void delay(uint16_t time);
 
+/**
+ * Test Functions
+ */
+
+void testDelay();
 
 #endif

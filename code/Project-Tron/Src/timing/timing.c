@@ -2,6 +2,7 @@
  * CONTAINS HIGH LEVEL UTILITIES THAT USES timer.c
  */
 #include "timer.h"
+#include "io/led.h"
 
 #define ELAPSED_PERIOD_MS 500
 
@@ -49,5 +50,23 @@ void delay(uint16_t time) {
 	delayFlag = 0;
 	timer_oneshot_call(time, delayCallback);
 	while (!delayFlag) {}
+}
+
+/**
+ * Test Functions
+ */
+
+void testDelay() {
+	led_init();
+	initElapsedTimer();
+
+	uint16_t counter = 0;
+
+for (;;) {
+		delay(1000);
+		++counter;
+		led_set_all(counter);
+
+	}
 }
 

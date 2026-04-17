@@ -53,15 +53,16 @@ int main(void)
 	// Exercise 1: Digital I/O
 
 	// Exercise 2: Timer Interface
+	testDelay();
 
 	// Exercise 3: Serial interface
 	// testSerial();
-	// testSerialString();
+	//testSerialString();
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
 	// testAccel();
-	testAttitude();
+	// testAttitude();
 
 	// Exercise 5: Integration Task
 
