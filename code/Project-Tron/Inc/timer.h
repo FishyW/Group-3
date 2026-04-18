@@ -12,13 +12,16 @@ void timer_init(uint16_t user_period,
 void enable_timer(void);
 
 // setters
+void timer_set_period_us(uint16_t new_period);
 void timer_set_period(uint16_t new_period);
+
 void timer_set_delay(uint16_t new_delay);
 void timer_set_period_cb(void (*callback)(void *args));
 void timer_set_delay_cb(void (*callback)(void *args));
 
 // getters
-uint16_t timer_get_period(void);
+uint16_t timer_get_period_us(void);
+
 uint16_t timer_get_delay(void);
 
 // get the counter's value (time elapsed in microseconds)

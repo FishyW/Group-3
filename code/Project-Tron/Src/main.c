@@ -25,7 +25,7 @@
 #include "sensors/gyro.h"
 #include "sensors/accel.h"
 #include "sensors/attitude.h"
-
+#include "pwm.h"
 
 #include "timer.h"
 
@@ -52,8 +52,10 @@ int main(void)
 	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM, BUT DO NOT DELETE THEM
 	// Exercise 1: Digital I/O
 
+
 	// Exercise 2: Timer Interface
 	// testDelay();
+	testPWM();
 
 	// Exercise 3: Serial interface
 	// testSerial();
@@ -61,8 +63,8 @@ int main(void)
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
-	//testAccel();
-	testAttitude();
+	// testAccel();
+	// testAttitude();
 
 	// Exercise 5: Integration Task
 
