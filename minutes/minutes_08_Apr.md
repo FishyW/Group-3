@@ -67,7 +67,7 @@ This question focuses on combining all modules into a full working system across
 
 ### Imposed Deadlines:
 - Finish all header files by 10/04/2026
-- Complete some progress on individual assigned questions by 11/04/2026
+- Complete some progress on individual assigned questions by 13/04/2026
 
 ### Next Meeting Date:
-12//04/2026
+14/04/2026
