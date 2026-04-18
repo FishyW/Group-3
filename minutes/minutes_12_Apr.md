@@ -63,4 +63,4 @@ This question focuses on combining all modules into a full working system across
 - [ ] Part C: Use Board 2 to control servo position and LED heading display based on received data
 
 ### Next Meeting Date:
-[19/04/2026]
+19/04/2026
