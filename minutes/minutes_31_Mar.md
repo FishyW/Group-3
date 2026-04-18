@@ -1,168 +1,59 @@
-# MTRX2700 Group 11 | Meeting Minutes
+# MTRX Group 3 - "Completionists"
+## Date - 31/03/2026
 
-**Date:** [31/03/2026]  
-**Time:** [3:00 pm]  
-**Location:** [Mechatronics Dry Lab | Link Building Room 330]  
-**Recorded by:** Jack Ryder  
-
-## Attendees
+### Present:
 - Jack Ryder
 - Winston Wijaya
 - Denny An
 - David Li
 
-**Apologies/Absences:** None
+### Meeting Purpose:
+To review the lab assignment, decide on a modular programming approach, assign each group member a question, and set expectations for progress before the next meeting.
 
----
+### New Items:
+- Question 1 - Jack Ryder
+- Question 2 - Denny An
+- Question 3 - Winston Wijaya
+- Question 4 - David Li
+- Question 5 - All members
 
-## Agenda
-1. Go through the assignment requirements  
-2. Plan the modular structure of the code  
-3. Assign roles for each exercise  
-4. Set a timeline for completion  
+### Progress Checklist:
 
----
+#### Question 1 - Digital I/O (Jack Ryder)
+This question focuses on creating reusable modules for GPIO, LEDs, and button input on the STM32F3 Discovery Board.
+- [ ] Part A: Generic GPIO module for input/output pin setup and read/write access
+- [ ] Part B: Separate button and LED interface modules built on the GPIO module
+- [ ] Part C: Button callback function using a function pointer
+- [ ] Part D: LED state encapsulated through get/set functions only
+- [ ] Part E: Advanced LED speed restriction using a timer without polling delay
 
-## Discussion Summary
+#### Question 2 - Timer Interface (Denny An)
+This question focuses on building a hardware timer module, including periodic callbacks, timer reset behaviour, PWM generation, and one-shot timing events.
+- [ ] Part A: Timer module that triggers a callback at a regular interval
+- [ ] Part B: Timer reset function with get/set access for the timer period
+- [ ] Part C: PWM generation at 50 Hz for hobby servo control
+- [ ] Part D: One-shot timer event with delay and callback function
 
-### 1. Assignment Overview
-The group reviewed the full assignment and agreed to complete it in a modular way, building and testing each software component separately before attempting the final integration task.
+#### Question 3 - Serial Interface (Winston Wijaya)
+This question focuses on UART communication for sending and receiving structured data, as well as debug strings and interrupt-based serial handling.
+- [ ] Part A: UART module for sending and receiving arrays of bytes
+- [ ] Part B: `sendString` function for serial debugging output
+- [ ] Part C: `sendMsg` function for structured message transmission
+- [ ] Part D: `receiveMsg` function with checksum validation and callback
+- [ ] Part E: Interrupt-based serial receiving
+- [ ] Part F: Interrupt-based transmitting with double buffering
 
-### 2. Modularity Plan
-The group agreed that each major function of the assignment should be separated into its own module. This will make the code easier to test, debug, and integrate later.
+#### Question 4 - I2C Sensor Interfacing (David Li)
+This question focuses on building an I2C interface for the Discovery Board compass module and storing the returned magnetometer data in a shared structure.
+- [ ] Part A: I2C magnetometer module
+- [ ] Part B: Data structure containing raw magnetometer values, decoded heading, and timestamp
+- [ ] Part C: Advanced attitude estimation using accelerometer and gyro data
 
-Proposed modules:
-- **GPIO module** for button and LED interfacing
-- **Timer module** for delays, callback timing, and PWM generation
-- **UART module** for serial communication
-- **I2C module** for magnetometer/compass communication
-- **Sensor module** for handling magnetometer data structures and processing
-- **Main/integration file** to combine all modules in Exercise 5
+#### Question 5 - Integration Task (All Members)
+This question focuses on combining all modules into a full working system across two STM32 boards using magnetometer data, UART communication, button input, servo output, and LEDs.
+- [ ] Part A: Read magnetometer data on STM32 Board 1 and send it over UART to STM32 Board 2
+- [ ] Part B: Use an interrupt-driven button input on Board 1 to change display mode
+- [ ] Part C: Use Board 2 to control servo position and LED heading display based on received data
 
-### 3. Exercise Breakdown
-
-#### Exercise 1: Digital I/O
-The group discussed creating a module that can:
-- configure GPIO pins as input or output
-- perform digital read and write operations
-- support button and LED interfacing
-- potentially use callback functions for button events
-- prevent LEDs from changing too quickly by adding a cooldown/throttle if required
-
-The group agreed this exercise should focus on building a reusable GPIO interface first, then wrapping it in simpler LED/button-specific functions.
-
-#### Exercise 2: Timer Interface
-The group discussed creating a timer module that can:
-- trigger callback functions after a set period
-- support adjustable timing
-- support one-shot events
-- generate PWM signals for servo motor control
-
-The timer module will be important for both Exercise 2 and the final integration task.
-
-#### Exercise 3: Serial Interface
-The group discussed creating a UART module that can:
-- send and receive bytes
-- send strings over USART1
-- transmit a structured packet with start byte, message type, body, stop byte, and checksum
-- receive structured packets and respond using a callback
-- later replace polling with interrupts for receive and transmit
-
-#### Exercise 4: I2C Sensor Interfacing
-The group discussed implementing I2C communication for the magnetometer/compass and storing returned data in a structure.
-
-The group also noted that accelerometer data may later be used for attitude estimation.
-
-#### Exercise 5: Integration Task
-The group identified that the final task will combine all previous modules:
-- one board reads magnetometer data
-- data is packaged into a structure and sent over UART
-- a button interrupt changes the display mode
-- the second board displays data using either LEDs or servo position
-
----
-
-## Decisions Made
-- The assignment will be completed **module by module** before full integration.
-- Each module should be written so it can be tested independently.
-- Callback functions will be used where useful, especially for buttons, timers, and serial receive events.
-- Exercise 5 will only begin after the GPIO, timer, UART, and I2C modules are functioning individually.
-- Progress will be tracked by assigning responsibility for each module to a group member.
-
----
-
-## Task Allocation / Who Is Doing What
-
-| Team Member | Assigned Work |
-|---|---|
-| **Jack Ryder** | Completion of Q1
-| **Denny An** | Completion of Q2
-| **Winston Wijaya** | Completion of Q3
-| **David Li** | Completion of Q4
-| **All members** | Completion of Q5
-
----
-
-## Timeline
-- **Stage 1:** Complete GPIO, timer, and UART core modules
-- **Stage 2:** Complete I2C magnetometer interfacing
-- **Stage 3:** Test each module individually
-- **Stage 4:** Integrate all modules for Exercise 5
-- **Stage 5:** Debug, refine, and prepare final submission
-
----
-
-## Action Items
-
-| Action Item | Person Responsible | Due Date | Status |
-|---|---|---|---|
-| Review full assignment requirements and confirm module list | All members | [31/03/2026] | Complete |
-| Create base GPIO module for digital input/output | Jack | [05/04/2026] | Not started |
-| Create LED/button wrapper functions using GPIO module | Jack | [05/04/2026] | Not started |
-| Develop timer module with configurable callback timing | Denny | [05/04/2026] | Not started |
-| Investigate PWM requirements for servo control | Denny | [05/04/2026] | Not started |
-| Develop UART send/receive functions | Winston | [05/04/2026] | Not started |
-| Design serial packet structure with checksum | Winston | [05/04/2026] | Not started |
-| Review magnetometer I2C requirements | David | [05/04/2026] | Not started |
-| Begin integration plan for Exercise 5 | All members | [12/04/2026] | Not started |
-
----
-
-## Progress Checklist
-
-### Exercise 1: Digital I/O
-- [ ] GPIO input/output setup
-- [ ] Digital read/write functions
-- [ ] LED interface
-- [ ] Button interface
-- [ ] Callback/event behaviour
-
-### Exercise 2: Timer Interface
-- [ ] Timer callback functionality
-- [ ] Adjustable timing/reset logic
-- [ ] PWM generation
-- [ ] One-shot event support
-
-### Exercise 3: Serial Interface
-- [ ] Byte send/receive
-- [ ] String transmission
-- [ ] Structured packet transmission
-- [ ] Structured packet receive
-- [ ] Interrupt-based receive
-- [ ] Interrupt-based transmit
-
-### Exercise 4: I2C Sensor Interfacing
-- [ ] I2C communication
-- [ ] Magnetometer data structure
-- [ ] Accelerometer/attitude estimation support
-
-### Exercise 5: Integration
-- [ ] Send magnetometer data over UART
-- [ ] Button interrupt changes display mode
-- [ ] Servo/LED response to heading data
-
----
-
-## Next Meeting
-**Date:** [08/04/2026]  
-**Focus:** Begin programming for all core components of assignment
+### Next Meeting Date:
+08/04/2026
