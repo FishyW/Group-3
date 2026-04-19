@@ -56,7 +56,7 @@ int main(void)
 
 	// Exercise 2: Timer Interface
 	// testDelay();
-	 testServo();
+	 // testServo();
 
 	// Exercise 3: Serial interface
 	// testSerial();
@@ -68,7 +68,8 @@ int main(void)
 	// testAttitude();
 
 	// Exercise 5: Integration Task
-
+	//runBoardA();
+	runBoardB();
 
     /* Loop forever */
 	for(;;);
