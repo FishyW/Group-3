@@ -6,10 +6,30 @@
 #include "io/led.h"
 
 
-
 #define MAX_UART_BUFFER 256
 #define STX_CHARACTER 0x02
 #define ETX_CHARACTER 0x03
+
+#define FLASH_LED 0
+
+// helper function to flash leds
+void flashLeds() {
+	if (!FLASH_LED) {
+		return;
+	}
+
+	for (int i = 0; i < 2; ++i) {
+		led_set_all(0xFF);
+		delayElapsed(500);
+		led_set_all(0x0);
+		delayElapsed(500);
+	}
+
+}
+
+
+void sendNextByte(SerialPort *serial_port);
+void receiveNextByte(SerialPort *serial_port);
 
 typedef struct ReceiverBufferMetadata {
 	uint8_t receiveBuffer[MAX_UART_BUFFER];
@@ -56,6 +76,7 @@ struct _SerialPort {
 	UARTMetadata metadata;
 	USART_TypeDef *UART;
 	GPIO_TypeDef *GPIO;
+	volatile uint32_t IRQn;
 	volatile uint32_t MaskAPB2ENR;	// mask to enable RCC APB2 bus registers
 	volatile uint32_t MaskAPB1ENR;	// mask to enable RCC APB1 bus registers
 	volatile uint32_t MaskAHBENR;	// mask to enable RCC AHB bus registers
@@ -67,32 +88,65 @@ struct _SerialPort {
 };
 
 
-// helper function to flash leds
-void flashLeds() {
-	for (int i = 0; i < 3; ++i) {
-		led_set_all(0xFF);
-		delayElapsed(1000);
-		led_set_all(0x0);
-		delayElapsed(1000);
+
+
+void UARTIRQHandler(SerialPort* serial_port) {
+	// if we have an overrun error
+	// would be good to show error in the LED
+	// note that we explicitly check for ORE since by enabling RXNEIE
+	// either ORE or RXNE can trigger this interrupt
+	if (serial_port->UART->ISR & USART_ISR_ORE) {
+		// clear the ORE bit so it doesnt refire this interrupt
+		serial_port->UART->ICR |=  USART_ICR_ORECF;
 	}
 
+	sendNextByte(serial_port);
+	receiveNextByte(serial_port);
 }
 
+// NOTE USART1 uses
+// PC4 => TX
+// PC5 => RX
 SerialPort USART1_PORT = {
 		{0},
 		USART1,
 		GPIOC,
+		USART1_IRQn,
 		RCC_APB2ENR_USART1EN, // bit to enable for APB2 bus
 		0x00,	// bit to enable for APB1 bus
 		RCC_AHBENR_GPIOCEN, // bit to enable for AHB bus
-		0xA00,
-		0xF00,
-		0x770000,  // for USART1 PC10 and 11, this is in the AFR low register
+		0xA00, // pin mode value (MODER4, MODER5) => Alternate Function
+		0xF00, // pin speed value (OSPEEDR4, OSPEEDR5) => (high speed)
+		0x770000,  // for USART1 PC4 and 5, this is in the AFR low register
 		0x00, // no change to the high alternate function register
 		0x00 // default function pointer is NULL
 		};
 
+// PC10 => UART4_TX
+// PC11 => UART4_RX
+SerialPort UART4_PORT = {
+		{0},
+		UART4,
+		GPIOC,
+		UART4_IRQn,
+		0x00, // bit to enable for APB2 bus
+		RCC_APB1ENR_UART4EN,	// bit to enable for APB1 bus
+		RCC_AHBENR_GPIOCEN, // bit to enable for AHB bus
+		0xA00000, // pin mode value (MODER10, MODER11) => Alternate Function
+		0xF00000, // pin speed value (OSPEEDR10, OSPEEDR11) => (high speed)
+		0x00,  // no change to the high alternate function register
+		0x5500, // for UART4 PC10 and 11, this is in the AFR high register
+		0x00 // default function pointer is NULL
+};
 
+// IRQ event handler
+void USART1_EXTI25_IRQHandler() {
+	UARTIRQHandler(&USART1_PORT);
+}
+
+void UART4_EXTI34_IRQHandler() {
+	UARTIRQHandler(&UART4_PORT);
+}
 
 
 void sendNextByte(SerialPort *serial_port) {
@@ -280,21 +334,6 @@ void receiveNextByte(SerialPort *serial_port) {
 }
 
 
-// IRQ event handler
-void USART1_EXTI25_IRQHandler() {
-
-	// if we have an overrun error
-	// would be good to show error in the LED
-	// note that we explicitly check for ORE since by enabling RXNEIE
-	// either ORE or RXNE can trigger this interrupt
-	if (USART1_PORT.UART->ISR & USART_ISR_ORE) {
-		// clear the ORE bit so it doesnt refire this interrupt
-		USART1_PORT.UART->ICR |=  USART_ICR_ORECF;
-	}
-
-	sendNextByte(&USART1_PORT);
-	receiveNextByte(&USART1_PORT);
-}
 
 void enableSerialInterrupt(SerialPort *serial_port) {
 	__disable_irq();
@@ -304,7 +343,7 @@ void enableSerialInterrupt(SerialPort *serial_port) {
 	// even as we're running the main program normally
 	serial_port->UART->CR1 |= USART_CR1_RXNEIE;
 
-	NVIC_EnableIRQ(USART1_IRQn);
+	NVIC_EnableIRQ(serial_port->IRQn);
 
 	__enable_irq();
 }

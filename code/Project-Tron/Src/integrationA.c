@@ -48,8 +48,11 @@ static void initializeBoardA(void)
     updateModeLeds();
 
     // initialise communication/sensor modules
+    // our send frequency is 10ms so we need to send all our data within 10ms
+    // 1/(38400 signals/second) * 10 signals/frame * 29 frames (BoardMessage is 24 bytes + 5 redundancy byte)
+    // 0.007552083333 => 7.55ms (our data can be sent within the delay interval)
     i2c1Init();
-    serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
+    serialInitialise(&UART4_PORT, BAUD_57600, 0x00);
     initElapsedTimer();
     magInit();
 
@@ -74,11 +77,14 @@ void runBoardA(void)
             // include display state in the same message
             boardMsg.displayState = displayState;
 
+
+
             // send <magData + displayState> to UART
-            sendMsg(&USART1_PORT, (uint8_t *)&boardMsg, sizeof(BoardMessage), 0);
+            sendMsg(&UART4_PORT, (uint8_t *)&boardMsg, sizeof(BoardMessage), 0);
         }
 
         // 10 ms => 100 Hz
+        // at high frequency make sure to disable LED flashing
         delayElapsed(10);
     }
 }

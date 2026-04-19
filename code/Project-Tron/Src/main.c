@@ -61,7 +61,7 @@ int main(void)
 
 	// Exercise 3: Serial interface
 	// testSerial();
-	//testSerialString();
+	// testSerialString();
 
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
@@ -70,8 +70,8 @@ int main(void)
 	// testMagnetometer();
 
 	// Exercise 5: Integration Task
-	 runBoardA();
-	// runBoardB();
+	// runBoardA();
+	runBoardB();
 
     /* Loop forever */
 	for(;;);

@@ -11,6 +11,7 @@ typedef struct _SerialPort SerialPort;
 
 
 extern SerialPort USART1_PORT;
+extern SerialPort UART4_PORT;
 
 // baud rate constants are defined here
 enum {

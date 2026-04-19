@@ -35,7 +35,7 @@ void writeHeadingToLEDs(float heading) {
 	}
 
 	// SOUTH
-	else if (heading >= 157.5 && heading < -157.5) {
+	else if (heading >= 157.5 || heading < -157.5) {
 		led_set_all(1 << 5);
 	}
 
@@ -80,10 +80,17 @@ void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
 	BoardMessage* message = (BoardMessage*) buffer;
 
 	if (message->displayState == 0) {
+
+		servoWrite(0);
 		// Jack
 		// change LED state based on magnetometer
 		writeHeadingToLEDs(message->magSample.heading_deg);
+
 	} else {
+
+		// turn off LEDs
+		led_set_all(0);
+
 		// Denny
 		// change servo state based on magentometer
 		writeHeadingToServo(message->magSample.heading_deg);
@@ -95,7 +102,7 @@ void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
 }
 
 void initializeBoardB() {
-	serialInitialise(&USART1_PORT, BAUD_9600, receiveCallback);
+	serialInitialise(&UART4_PORT, BAUD_57600, receiveCallback);
 	initElapsedTimer();
 	servoInit();
 	led_init();
@@ -115,7 +122,7 @@ void runBoardB() {
 
 	while (1) {
 		// call receiveMsg here
-		receiveMsg(&USART1_PORT);
+		receiveMsg(&UART4_PORT);
 
 		// Mock data
 //		BoardMessage boardMsg;
