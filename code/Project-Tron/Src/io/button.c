@@ -18,7 +18,7 @@ void button_init(button_callback_t callback) {
     // Enable SYSCFG clock for EXTI configuration
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
-    // Connect EXTI0 line to PA0
+    // Connect EXTI0 line to PA0, clears EXTI0 configuration bits for bits 0-3
     SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI0;
 
     // Unmask EXTI line 0
@@ -36,7 +36,7 @@ bool button_is_pressed(void) {
     return gpio_read(&button_gpio);
 }
 
-// Interrupt service routine for EXTI line 0
+// Interrupt service routine for EXTI line 0 (the line that the CPU jumps to when interuppted)
 void EXTI0_IRQHandler(void) {
     // Check interrupt came from EXTI0
     if (EXTI->PR & EXTI_PR_PR0) {
