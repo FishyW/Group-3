@@ -61,7 +61,7 @@ static void initializeBoardA(void)
 // Board A sends over UART magnetometer data to Board B
 // Board A also has an interrupt-driven function for the button
 // The button tells Board B how to display the output
-void testBoardA(void)
+void runBoardA(void)
 {
     BoardMessage boardMsg;
 
