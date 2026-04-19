@@ -28,6 +28,7 @@
 #include "pwm.h"
 
 #include "timer.h"
+#include "servo.h"
 
 #include "integration.h"
 
@@ -54,7 +55,8 @@ int main(void)
 
 
 	// Exercise 2: Timer Interface
-	testDelay();
+	// testDelay();
+	 testServo();
 	// testPWM();
 
 	// Exercise 3: Serial interface

@@ -8,25 +8,26 @@ static uint8_t one_shot_mode;
 
 static void (*period_cb)(void *args) = NULL;
 
-void timer_init(uint32_t user_period,
-                void (*user_period_cb)(void *args))
-{
-    timer_set_period(user_period);
-    timer_set_period_cb(user_period_cb);
 
-    enable_timer();
-}
-
-void enable_timer(void) {
+void setup_timer(void) {
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     TIM2->PSC   = 7;
-    TIM2->ARR   = period_us;
-    TIM2->DIER |= TIM_DIER_UIE;
-    TIM2->CR1  |= TIM_CR1_CEN;
 
     NVIC_EnableIRQ(TIM2_IRQn);
 }
+
+
+void timer_init(uint32_t user_period,
+                void (*user_period_cb)(void *args))
+{
+	setup_timer();
+	timer_set_period_cb(user_period_cb);
+    timer_set_period(user_period);
+
+
+}
+
 
 // set the period in microseconds
 void timer_set_period_us(uint32_t new_period_us) {

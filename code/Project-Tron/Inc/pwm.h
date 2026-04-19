@@ -6,14 +6,14 @@
 
 // ─── public functions ─────────────────────────────────────
 
-void pwm_init(uint16_t new_pwm_period,
-              uint16_t new_duty_cycle,
+void pwm_init(uint32_t new_pwm_period,
+			uint32_t new_duty_cycle,
               void (*new_rising_edge_cb)(void *args),
               void (*new_falling_edge_cb)(void *args));
 
 // setters
-void pwm_set_period_us(uint16_t new_pwm_period_us);
-void pwm_set_duty_cycle_us(uint16_t new_pwm_duty_cycle_us);
+void pwm_set_period_us(uint32_t new_pwm_period_us);
+void pwm_set_duty_cycle_us(uint32_t new_pwm_duty_cycle_us);
 void pwm_set_rising_edge_cb(void (*new_rising_edge_cb)(void *args));
 void pwm_set_falling_edge_cb(void (*new_falling_edge_cb)(void *args));
 
