@@ -31,6 +31,7 @@
 #include "servo.h"
 
 #include "integration.h"
+#include "sensors/magnetometer.h"
 
 volatile uint32_t tick_ms = 0;
 
@@ -66,10 +67,11 @@ int main(void)
 	// testGyro();
 	// testAccel();
 	// testAttitude();
+	// testMagnetometer();
 
 	// Exercise 5: Integration Task
-	//runBoardA();
-	runBoardB();
+	 runBoardA();
+	// runBoardB();
 
     /* Loop forever */
 	for(;;);
