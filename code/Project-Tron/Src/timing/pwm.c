@@ -31,7 +31,8 @@ void pwm_init(	uint32_t new_pwm_period_us, uint32_t new_duty_cycle_us,
 	pwm_set_falling_edge_cb(new_falling_edge_cb);
 
 	// start timer at duty_cycle period, PWM logic handles the rest
-	timer_init(duty_cycle_us/1000, pwm_callback);
+	// use TIM3 timer, note that this is fine since 20,000 (20ms) < 65,536 (65ms)
+	timer_init(&TIM3_TIMER, duty_cycle_us/1000, pwm_callback);
 }
 
 void pwm_set_period_us(uint32_t new_pwm_period_us){
@@ -54,11 +55,11 @@ void pwm_set_falling_edge_cb(void (*new_falling_edge_cb)(void *args)){
 void pwm_callback(void *args){
     if (state == PWM_STATE_HIGH) {
     	if (rising_edge_cb != NULL) rising_edge_cb(NULL);
-        timer_set_period_us(duty_cycle_us);    	// wait for pulse width (e.g. 1500us)
+        timer_set_period_us(&TIM3_TIMER, duty_cycle_us);    	// wait for pulse width (e.g. 1500us)
         state = PWM_STATE_LOW;
     } else {
     	if (falling_edge_cb != NULL) falling_edge_cb(NULL);
-        timer_set_period_us(period_us - duty_cycle_us); // wait for remainder of 20ms
+        timer_set_period_us(&TIM3_TIMER, period_us - duty_cycle_us); // wait for remainder of 20ms
         state = PWM_STATE_HIGH;
     }
 }

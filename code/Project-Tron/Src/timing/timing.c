@@ -18,12 +18,14 @@ void periodCallback(void* value) {
 }
 
 void initElapsedTimer() {
-	timer_init(ELAPSED_PERIOD_MS, periodCallback);
+	// use TIM2_TIMER for the elapsed timer
+	// since we need all 32 bits
+	timer_init(&TIM2_TIMER, ELAPSED_PERIOD_MS, periodCallback);
 }
 
 
 uint32_t getNow() {
-	return timer_get_elapsed() + elapsedRounded;
+	return timer_get_elapsed(&TIM2_TIMER) + elapsedRounded;
 }
 
 uint32_t getElapsed() {
@@ -48,7 +50,7 @@ void delayCallback(void* value) {
 
 void delay(uint16_t time) {
 	delayFlag = 0;
-	timer_oneshot_call(time, delayCallback);
+	timer_oneshot_call(&TIM2_TIMER, time, delayCallback);
 	while (!delayFlag) {}
 }
 

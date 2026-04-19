@@ -57,7 +57,6 @@ int main(void)
 	// Exercise 2: Timer Interface
 	// testDelay();
 	 testServo();
-	// testPWM();
 
 	// Exercise 3: Serial interface
 	// testSerial();

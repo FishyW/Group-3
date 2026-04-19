@@ -20,6 +20,5 @@ void pwm_set_falling_edge_cb(void (*new_falling_edge_cb)(void *args));
 // callback — registered with timer module, not called directly
 void pwm_callback(void *args);
 
-void testPWM();
 
 #endif
