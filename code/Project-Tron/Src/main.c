@@ -31,6 +31,7 @@
 #include "servo.h"
 
 #include "integration.h"
+#include "sensors/magnetometer.h"
 
 volatile uint32_t tick_ms = 0;
 
@@ -50,13 +51,15 @@ void SysTick_Handler(void)
 int main(void)
 {
 
+	SysTick_Config(8000U);
 	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM, BUT DO NOT DELETE THEM
 	// Exercise 1: Digital I/O
 
 
 	// Exercise 2: Timer Interface
 	// testDelay();
-	 testServo();
+	//testServo();
+	// testPWM();
 
 	// Exercise 3: Serial interface
 	// testSerial();
@@ -66,8 +69,10 @@ int main(void)
 	// testGyro();
 	// testAccel();
 	// testAttitude();
+	//testMagnetometer();
 
 	// Exercise 5: Integration Task
+	testBoardA();
 
 
     /* Loop forever */
