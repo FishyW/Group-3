@@ -22,8 +22,8 @@ void servoInit() {
 }
 
 void servoWrite(float angle) {
-	// map [-90, 90] => [1, 2]
-	uint32_t pwm = (uint32_t)(((angle + 90)/180 + 1) * 1000);
+	// map [0, 90] => [1, 2]
+	uint32_t pwm = (uint32_t)((angle/90 + 1) * 1000);
 
 	pwm_init(20000, pwm, onPWMRising, onPWMFalling);
 
@@ -33,7 +33,8 @@ void testServo() {
 	servoInit();
 
 	double reverse = 0;
-	float angle = -90;
+	float angle = 0;
+
 
 
 	// 10 degrees per second
@@ -49,7 +50,7 @@ void testServo() {
 		if (angle >= 90) {
 			reverse = 1;
 		}
-		if (angle <= -90) {
+		if (angle <= 0) {
 			reverse = 0;
 		}
 
