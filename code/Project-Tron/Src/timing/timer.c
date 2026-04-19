@@ -3,12 +3,12 @@
 #include "stm32f303xc.h"
 
 
-static uint16_t period_us;
+static uint32_t period_us;
 static uint8_t one_shot_mode;
 
 static void (*period_cb)(void *args) = NULL;
 
-void timer_init(uint16_t user_period,
+void timer_init(uint32_t user_period,
                 void (*user_period_cb)(void *args))
 {
     timer_set_period(user_period);
@@ -29,7 +29,7 @@ void enable_timer(void) {
 }
 
 // set the period in microseconds
-void timer_set_period_us(uint16_t new_period_us) {
+void timer_set_period_us(uint32_t new_period_us) {
 	// disable the clock first
 		TIM2->CR1  &= ~TIM_CR1_CEN;
 		TIM2->DIER &= ~TIM_DIER_UIE;
@@ -60,7 +60,7 @@ void timer_set_period_us(uint16_t new_period_us) {
 // Setters
 
 // sets the period in milliseconds
-void timer_set_period(uint16_t new_period) {
+void timer_set_period(uint32_t new_period) {
 	timer_set_period_us(new_period * 1000);
 }
 
@@ -71,11 +71,11 @@ void timer_set_period_cb(void (*callback)(void *args)) {
 
 
 // Getters
-uint16_t timer_get_period_us(void) {
+uint32_t timer_get_period_us(void) {
     return period_us;
 }
 
-uint16_t timer_get_period(void) {
+uint32_t timer_get_period(void) {
     return period_us * 1000;
 }
 
@@ -85,7 +85,7 @@ uint32_t timer_get_elapsed(void) {
 }
 
 // Advanced Functionality: Oneshot function.
-void timer_oneshot_call(uint16_t user_delay,
+void timer_oneshot_call(uint32_t user_delay,
                         void (*user_delay_cb)(void *args))
 {
     timer_set_period(user_delay);
