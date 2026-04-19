@@ -12,15 +12,15 @@
 
 #include <stdint.h>
 
-// stores current mode sent to Board B
+// stores current display state sent to Board B
 // 0 = servo mode
 // 1 = LED array mode
-static volatile uint8_t button_mode = 0;
+static volatile uint8_t displayState = 0;
 
 // update LEDs so exactly one is on for each state
 static void updateModeLeds(void)
 {
-    if (button_mode == 0U) {
+    if (displayState == 0U) {
         // state 0
         led_set(LED0, true);
         led_set(LED1, false);
@@ -34,10 +34,10 @@ static void updateModeLeds(void)
 // interrupt-driven button callback
 static void buttonPressed(void)
 {
-    // toggle mode each time button is pressed
-    button_mode ^= 1U;
+    // toggle display state each time button is pressed
+    displayState ^= 1U;
 
-    // update LEDs to match new mode
+    // update LEDs to match new state
     updateModeLeds();
 }
 
@@ -68,21 +68,17 @@ void testBoardA(void)
     initializeBoardA();
 
     while (1) {
-        // Jack
         // read magnetometer sample into message struct
         if (magReadSample(&boardMsg.magSample) == 1) {
 
-            // include button/display mode in the same message
-            boardMsg.buttonMode = button_mode;
+            // include display state in the same message
+            boardMsg.displayState = displayState;
 
-            // Winston
-            // send <magData + button state> to UART
-            sendMsg(&USART1_PORT, (uint8_t *) &boardMsg, sizeof(BoardMessage), 0);
+            // send <magData + displayState> to UART
+            sendMsg(&USART1_PORT, (uint8_t *)&boardMsg, sizeof(BoardMessage), 0);
         }
 
-        // Denny
-        // set the delay to 10 ms => 100 Hz
-        // same as the magnetometer ODR
+        // 10 ms => 100 Hz
         delayElapsed(10);
     }
 }
