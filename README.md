@@ -52,7 +52,6 @@ For LED-only testing, uncomment:
 in `main.c`.
 
 ### Valid input
-- Valid GPIO pins: `0` to `15`
 - Valid GPIO modes: input or output
 - Valid LED identifiers: `LED0` to `LED7`
 - `led_set_all()` accepts an 8-bit bitmask representing all LED states
