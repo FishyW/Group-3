@@ -4,6 +4,9 @@
 #include "io/button.h"
 #include "io/led.h"
 
+#include <stdio.h>
+
+
 #include "comm/i2c.h"
 #include "comm/uart.h"
 
@@ -53,6 +56,7 @@ static void initializeBoardA(void)
     // 0.007552083333 => 7.55ms (our data can be sent within the delay interval)
     i2c1Init();
     serialInitialise(&UART4_PORT, BAUD_57600, 0x00);
+     // serialInitialise(&USART1_PORT, BAUD_57600, 0x00);
     initElapsedTimer();
     magInit();
 
@@ -70,6 +74,8 @@ void runBoardA(void)
 
     initializeBoardA();
 
+    // uint32_t start = getNow();
+
     while (1) {
         // read magnetometer sample into message struct
         if (magReadSample(&boardMsg.magSample) == 1) {
@@ -81,6 +87,19 @@ void runBoardA(void)
 
             // send <magData + displayState> to UART
             sendMsg(&UART4_PORT, (uint8_t *)&boardMsg, sizeof(BoardMessage), 0);
+
+//            char string[50];
+
+            // rate limit sending string
+            // send every 200ms
+//            if (getNow() - start >= 200 * 1000) {
+//                start = getNow();
+//                snprintf(string, sizeof(string), "Heading: %.2f, Display: %d \r\n",
+//                		boardMsg.magSample.heading_deg,
+//						boardMsg.displayState);
+//                sendString(&USART1_PORT, string);
+//            }
+
         }
 
         // 10 ms => 100 Hz

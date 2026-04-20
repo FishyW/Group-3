@@ -72,8 +72,8 @@ int main(void)
 	// testMagnetometer();
 
 	// Exercise 5: Integration Task
-	runBoardA();
-	// runBoardB();
+//	runBoardA();
+	 runBoardB();
 
     /* Loop forever */
 	for(;;);

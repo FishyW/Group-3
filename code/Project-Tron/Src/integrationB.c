@@ -1,6 +1,7 @@
 // integration file for board 2
 #include "integration.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #include "comm/uart.h"
 
@@ -73,11 +74,26 @@ void writeHeadingToServo(float angle) {
 
 }
 
+
+uint32_t start = 0;
+
 void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
 
 	// Winston
 	// read and parse mag/button state data
 	BoardMessage* message = (BoardMessage*) buffer;
+
+	 char string[50];
+
+	// rate limit sending string
+	// send every 200ms
+//	if (getNow() - start >= 200 * 1000) {
+//		start = getNow();
+//		snprintf(string, sizeof(string), "Heading: %.2f, Display: %d \r\n",
+//				message->magSample.heading_deg,
+//				message->displayState);
+//		sendString(&USART1_PORT, string);
+//	}
 
 	if (message->displayState == 0) {
 
@@ -103,7 +119,11 @@ void receiveCallback(uint8_t* buffer, uint8_t size, uint8_t message_id) {
 
 void initializeBoardB() {
 	serialInitialise(&UART4_PORT, BAUD_57600, receiveCallback);
+//	serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
+
 	initElapsedTimer();
+
+
 	servoInit();
 	led_init();
 }
@@ -119,6 +139,8 @@ void initializeBoardB() {
 // button state => 1, use LED array else use servo
 void runBoardB() {
 	initializeBoardB();
+
+	start = getNow();
 
 	while (1) {
 		// call receiveMsg here
