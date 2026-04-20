@@ -36,7 +36,7 @@ At the highest level, the final integrated design uses **Board A** to read magne
 
 ---
 
-## Exercise 1 - Digital I/O and LED/Button Abstraction
+## Exercise 1 - Digital I/O
 
 ### Summary
 This exercise builds the low-level and reusable digital I/O modules. The `gpio` module provides generic input/output setup, read, write, and toggle functionality. The `led` module wraps the eight onboard LEDs as a software-controlled array, while the `button` module configures the user button on **PA0** with an interrupt callback using **EXTI0**.
@@ -89,7 +89,7 @@ The LED module stores a software copy of LED state, so other modules can query L
 
 ---
 
-## Exercise 2 - Timer Interface, PWM, and Servo Control
+## Exercise 2 - Timer Interface
 
 ### Summary
 This exercise implements reusable timer functionality using STM32 timers, then builds high-level delay utilities and PWM-based servo control on top of it. The timer module supports periodic callbacks, one-shot timing, elapsed time measurement, and delay functions. The PWM module uses timer callbacks to alternate between rising and falling edges, and the servo module converts an angle command into a pulse width for **PB6**.
@@ -151,7 +151,7 @@ The elapsed-time helper uses `TIM2_TIMER` as a long-running timing base, while P
 
 ---
 
-## Exercise 3 - UART Serial Communication with Framed Packets
+## Exercise 3 - Serial Interface 
 
 ### Summary
 This exercise implements asynchronous UART transmit and receive logic with interrupt handling, packet framing, checksum validation, and a double-buffer receive design. Messages are framed as:
@@ -209,7 +209,7 @@ A strong feature of this module is the double-buffered receive design, which hel
 
 ---
 
-## Exercise 4 - Sensor Interfacing and Attitude Estimation
+## Exercise 4 - I2C Sensor Interfacing + SPI Attitude Estimator
 
 ### Summary
 This exercise covers the sensor subsystem. The gyroscope is read over SPI, while the accelerometer and magnetometer are read over I2C.
@@ -303,7 +303,7 @@ The heading calculation uses `atan2f` on the processed X and Y magnetometer valu
 
 ---
 
-## Exercise 5 - Two-Board Integration Task
+## Exercise 5 - Integration Task
 
 ### Summary
 The integration task links both boards into a complete system.
