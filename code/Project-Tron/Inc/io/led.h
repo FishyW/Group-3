@@ -31,4 +31,8 @@ uint8_t led_get_all(void);
 // Set all LEDs using a bitmask
 void led_set_all(uint8_t mask);
 
+
+// Test Functions
+void testLedSpeedLimiter();
+
 #endif

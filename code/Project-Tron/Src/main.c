@@ -33,6 +33,8 @@
 #include "integration.h"
 #include "sensors/magnetometer.h"
 
+#include "io/led.h"
+
 volatile uint32_t tick_ms = 0;
 
 
@@ -53,7 +55,7 @@ int main(void)
 
 	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM, BUT DO NOT DELETE THEM
 	// Exercise 1: Digital I/O
-
+	testLedSpeedLimiter();
 
 	// Exercise 2: Timer Interface
 	// testDelay();
@@ -71,7 +73,7 @@ int main(void)
 
 	// Exercise 5: Integration Task
 	// runBoardA();
-	runBoardB();
+	// runBoardB();
 
     /* Loop forever */
 	for(;;);

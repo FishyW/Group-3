@@ -1,6 +1,9 @@
 #include "io/led.h"
 #include "io/gpio.h"
 
+#include "timer.h"
+
+
 // Private GPIO objects for the 8 LEDs
 static gpio_t leds[8];
 
@@ -13,9 +16,24 @@ static uint8_t requested_state = 0;
 static uint32_t min_update_ms = 100;
 static volatile bool led_update_pending = false;
 
+
+uint32_t start_time_led[8] = {};
+uint32_t rate_limit_led_us = 0;
+
+
 void led_init(void) {
+
+	// init elapsed timer
+	initElapsedTimer();
+
+	// init led times
+	for (uint8_t i = 0; i < 8; ++i) {
+		start_time_led[i] = getNow();
+	}
+
+
     // STM32F3 Discovery LEDs are typically on GPIOE pins 8 to 15
-    for (int i = 0; i < 8; i++) {
+    for (uint8_t i = 0; i < 8; i++) {
         gpio_init(&leds[i], GPIOE, 8 + i, GPIO_MODE_OUTPUT);
     }
 
@@ -25,9 +43,22 @@ void led_init(void) {
     led_update_pending = false;
 }
 
+void led_set_rate_limit(uint32_t limit_us) {
+	rate_limit_led_us = limit_us;
+}
+
+
 void led_set(led_id_t led, bool state) {
+
     // Ignore invalid LED numbers
     if (led > LED7) return;
+
+    // restrict led set speed
+   if (getNow() - start_time_led[led] < rate_limit_led_us) {
+	   return;
+   }
+
+   start_time_led[led] = getNow();
 
     // BASIC VERSION:
     // Directly update hardware and stored state
@@ -39,18 +70,6 @@ void led_set(led_id_t led, bool state) {
         led_state &= ~(1U << led);
     }
 
-    // ADVANCED VERSION IDEA:
-    // Instead of changing hardware immediately, comment out the direct write above
-    // and only update requested_state here. A timer callback would later apply it.
-    /*
-    if (state) {
-        requested_state |= (1U << led);
-    } else {
-        requested_state &= ~(1U << led);
-    }
-
-    led_update_pending = true;
-    */
 }
 
 bool led_get(led_id_t led) {
@@ -74,24 +93,17 @@ void led_set_all(uint8_t mask) {
 }
 
 
-// Example of a timer-driven update function for the advanced task
-// This would be called periodically by a timer module
-void led_timer_callback(void) {
-    static uint32_t elapsed_ms = 0;
-    elapsed_ms++;
 
-    // Only allow physical LED change every min_update_ms
-    if (elapsed_ms >= min_update_ms && led_update_pending) {
-        elapsed_ms = 0;
-        led_update_pending = false;
+void testLedSpeedLimiter() {
+	led_init();
 
-        // Apply requested state to actual hardware
-        for (int i = 0; i < 8; i++) {
-            bool bit = (requested_state >> i) & 1U;
-            gpio_write(&leds[i], bit);
-        }
+	// set rate limit to 1 second
+	led_set_rate_limit(1000 * 1000);
 
-        // Update stored state after hardware output is changed
-        led_state = requested_state;
-    }
+	uint8_t counter = 0;
+	for (;;) {
+		led_set_all(counter);
+		counter += 1;
+		delayElapsed(100);
+	}
 }
