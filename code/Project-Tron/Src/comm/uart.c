@@ -538,6 +538,93 @@ void receiveMsg(SerialPort *serial_port) {
 
 
 
+
+/*
+
+Q1
+How do you handle the case when there is more data received than will fit in the
+buffer? => Line 291
+if (metadata->receiveBufferSize >= MAX_UART_BUFFER) {
+		metadata->receiveBufferSize = 0;
+		metadata->receiveError = 1;
+		return finishBufferWrite(doubleBuffer);
+	}
+=> receiveError will be set to 1, and buffer writing will terminate
+=> when buffer writing terminates reader can then read from the buffer
+=> receiveError, set to 1, (Line 506) which causes LEDs to flash if FLASH_LED define is set to 1
+
+Q2
+How do you determine when the incoming data has finished being received? Do
+you use a terminating character? What if this byte is missed of if the same byte
+appears elsewhere in the received data?
+=> ETX bit will be received, indicates termination
+=> if same byte appears elsewhere, ignore since we also account for the length of the buffer
+=> see line 317 (check ETX AND check if ETX is in the right position (BUFFER_LENGTH - 1))
+
+Q3
+What are some potential advantages and disadvantages of passing structures and
+raw bytes rather than strings as we did in the Assembly lab?
+=> Data needs to be converted to strings (and parsed back), this is slow!
+=> Also ASCII strings are only 7 bits long very inefficient!
+
+=> why strings? if the data is already a string, its better to just send the string
+=> no need to keep track of data length since string is null terminating
+
+Q4
+How do other software modules interact with the received data? Can they request
+the latest data? What happens with the incoming memory buffer after someone
+has requested the data? Do you clear the buffer? Do you have more than one
+buffer?.
+=> First initialize, then call receiveMessage().
+=> This requests for the data and if the data is available, callback is called
+=> if not then it spins
+
+=> Latest data is always received:
+=> Kernel receives data from UART, because of double buffer,
+=> new data is continually written into the kernel's buffer
+=> Kernel swaps when reader is finished reading
+
+=> Incoming memory buffer is left alone,
+=> until the kernel swaps the double buffer and overwrites it
+=> to prevent race conditions kernel only swaps if the reader is not reading the buffer
+
+Q5
+What happens if someone requests new serial port data before the current stream
+of data is complete (i.e. before the stream is terminated)?
+=> if reader buffer is empty, receiveMessage() will spin until kernel swaps
+=> if reader buffer is not empty, then it just reads the buffer
+
+Q6
+What if someone keeps working on the serial rx buffer at the same time as new
+data comes in?
+=> Buffer is copied to a new buffer, so the caller won't experience anything
+=> when reader is reading the buffer inside of receiveMsg, kernel won't swap
+=> unless finishedReading is set to 1, hence buffer remains consistent
+
+
+Advanced Demo:
+Set delay to 3000
+Breakpoint in receiveMessage:
+Play:
+Send the following within 3 seconds
+echo -ne '\x02\x0d\x02hello\r\n\0\x03k' > /dev/ttyACM0
+echo -ne '\x02\x0d\x02hello\r\n\0\x03k' > /dev/ttyACM0
+echo -ne '\x02\x0d\x02' > /dev/ttyACM0
+
+
+At the next receive, double buffer will look like
+Kernel: '\x02\x0d\x02'
+Reader: '\x02\x0d\x02hello\r\n\0\x03k'
+
+Press Play, notice that the reader can read the buffer
+While the kernel is "reading" the serial port
+
+Then next iteration, reader will again pause in receiveMessage()
+Finally,
+echo -ne 'hello\r\n\0\x03k' > /dev/ttyACM0
+Then reader can read the rest of the message
+
+ */
 uint32_t counter = 0;
 void serialCallback(uint8_t* buffer, uint8_t size, uint8_t id) {
 	// empty function, put a breakpoint here to see this working

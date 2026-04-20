@@ -55,7 +55,7 @@ int main(void)
 
 	// TEST FUNCTIONS, COMMENT OR UNCOMMENT THEM, BUT DO NOT DELETE THEM
 	// Exercise 1: Digital I/O
-	testLedSpeedLimiter();
+	// testLedSpeedLimiter();
 
 	// Exercise 2: Timer Interface
 	// testDelay();
@@ -72,7 +72,7 @@ int main(void)
 	// testMagnetometer();
 
 	// Exercise 5: Integration Task
-	// runBoardA();
+	runBoardA();
 	// runBoardB();
 
     /* Loop forever */
