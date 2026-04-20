@@ -31,7 +31,7 @@ typedef struct
     int16_t  raw_x;         /* raw X reading */
     int16_t  raw_y;         /* raw Y reading */
     int16_t  raw_z;         /* raw Z reading */
-    float    heading_deg;   /* heading in degrees, 0 to 360 */
+    float    heading_deg;   /* heading in degrees, -180 to 180 */
     uint32_t timestamp_ms;  /* time sample was read */
     uint8_t  valid;         /* 1 = valid sample, 0 = invalid */
 } MagSample;
