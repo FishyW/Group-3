@@ -91,17 +91,20 @@ The LED module stores a software copy of LED state, so other modules can query L
 ## Exercise 2 - Timer Interface
 
 ### Summary
-This exercise implements reusable timer functionality using STM32 timers, then builds high-level delay utilities and PWM-based servo control on top of it. The timer module supports periodic callbacks, one-shot timing, elapsed time measurement, and delay functions. The PWM module uses timer callbacks to alternate between rising and falling edges, and the servo module converts an angle command into a pulse width for **PB6**.
+This exercise implements reusable timer functionality using STM32 timers, then builds high-level delay utilities and PWM-based servo control on top of it. The timer module supports periodic callbacks, one-shot timing, elapsed time measurement, and delay functions. The PWM module uses timer callbacks to alternate HIGH and LOW between rising and falling edges, and the servo module converts an angle command into a pulse width for **PB6**.
 
 The servo logic maps angles in the range **0 to 90 degrees** into pulse widths from **1 ms to 2 ms**, with a PWM period of **20 ms**.
 
 ### Usage
-Use `timer_init()` to configure a timer with a callback and period, `delay()` or `delayElapsed()` for blocking delays, and `servoInit()` followed by `servoWrite(angle)` to drive the servo.
+Use `timer_init()` to configure a timer with a callback and period in repeating mode. Then use `timer_oneshot_call` with a new callback and period to get oneshot mode. Other useful functions include: `delay()` or `delayElapsed()` for timing delays / sleep function, and `servoInit()` followed by `servoWrite(angle)` to drive the servo.
 
 For testing, uncomment:
 - `testDelay()`
 - `testServo()`
-
+- `timer_demo_part_a()`
+- `timer_demo_part_b()`
+- `servo_demo_part_c()`
+- `timer_demo_part_d()`
 in `main.c`.
 
 ### Valid input
@@ -113,14 +116,17 @@ in `main.c`.
 ### Functions and modularity
 Key timer functions include:
 - `timer_init`
+- `timer_start`
+- `timer_stop`
+- `timer_reset_counter`
 - `timer_set_period_us`
 - `timer_set_period`
+- `timer_set_timer_cb`
+- `timer_set_mode`
+- `timer_get_period_us`
+- `timer_get_elapsed`
 - `timer_oneshot_call`
 - `timer_irq`
-- `getNow`
-- `getElapsed`
-- `delay`
-- `delayElapsed`
 
 The PWM layer provides:
 - `pwm_init`
@@ -139,6 +145,18 @@ The test functions used are:
 
 - `testServo()`  
   Sweeps the servo continuously by updating angle over time.
+
+- `timer_demo_part_a()`
+  Simply initialises a timer that blinks an LED.
+  
+- `timer_demo_part_b()`
+  Initialises part a but immediately changes the period to demonstrate timer_set_period
+  
+- `servo_demo_part_c()`
+  Writes an angle to servoWrite.
+  
+- `timer_demo_part_d()`
+  Turns one LED on after a delay and does not continue.
 
 The timer module also includes demonstration behaviour for:
 - periodic callbacks
