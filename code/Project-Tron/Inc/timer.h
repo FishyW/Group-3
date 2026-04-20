@@ -36,8 +36,17 @@ uint32_t timer_get_elapsed(TimerInfo* info);
 void timer_oneshot_call(TimerInfo* info, uint32_t user_delay,
                         void (*user_delay_cb)());
 
+void timer_irq(TimerInfo* info);
+
+void timer_set_timer_cb(TimerInfo* info, void (*callback)(void *args));
+
+void timer_demo_part_a();
+
+void timer_demo_part_b();
 
 void initElapsedTimer();
+
+void timer_demo_part_d();
 
 // get the current time relative to when initElapsedTimer is called
 // the unit is in microseconds

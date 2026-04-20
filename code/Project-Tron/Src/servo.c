@@ -72,3 +72,8 @@ void testServo() {
 
 	}
 }
+
+void servo_demo_part_c(){
+	servoInit();
+	servoWrite(90);
+}
