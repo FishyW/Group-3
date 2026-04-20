@@ -60,7 +60,7 @@ void testGyro() {
 	serialInitialise(&USART1_PORT, BAUD_9600, 0x00);
 	initElapsedTimer();
 
-	initializeSPI();
+	initializeGyro();
 
 	float thetaX = 0;
 	float thetaY = 0;
@@ -93,8 +93,8 @@ void testGyro() {
 		}
 
 
+
+
 		delayElapsed(1);
-
 	}
-
 }
