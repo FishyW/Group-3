@@ -59,7 +59,9 @@ int main(void)
 
 	// Exercise 2: Timer Interface
 	// testDelay();
-	 // testServo();
+	// testServo();
+	// timer_demo_part_a();
+	// timer_demo_part_b();
 
 	// Exercise 3: Serial interface
 	// testSerial();
@@ -72,8 +74,8 @@ int main(void)
 	// testMagnetometer();
 
 	// Exercise 5: Integration Task
-//	runBoardA();
-	 runBoardB();
+	// runBoardA();
+	// runBoardB();
 
     /* Loop forever */
 	for(;;);
