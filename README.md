@@ -23,8 +23,6 @@ The project was completed using a modular team structure so that each member cou
 - **David Li**  
   Worked on Section 7.1.2 (Digital I/O).
 
-All members contributed to final integration, debugging, and testing.
-
 ---
 
 ## Project Overview
