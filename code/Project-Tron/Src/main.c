@@ -62,6 +62,8 @@ int main(void)
 	// testServo();
 	// timer_demo_part_a();
 	// timer_demo_part_b();
+	// servo_demo_part_c();
+	// timer_demo_part_d();
 
 	// Exercise 3: Serial interface
 	// testSerial();
@@ -70,7 +72,7 @@ int main(void)
 	// Exercise 4: I2C Sensor Interfacing
 	// testGyro();
 	// testAccel();
-	// testAttitude();
+	testAttitude();
 	// testMagnetometer();
 
 	// Exercise 5: Integration Task
